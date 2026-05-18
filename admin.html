@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Admin Dashboard</title>
+
+<style>
+body{font-family:Arial;background:#f4f4f4;padding:20px;}
+.box{max-width:900px;margin:auto;background:white;padding:20px;border-radius:10px;}
+
+.item{
+background:#eee;
+padding:10px;
+margin:10px 0;
+border-radius:8px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+button{padding:8px;margin:5px;cursor:pointer;}
+.ok{background:green;color:white;border:none;}
+.ok:disabled{background:gray;cursor:not-allowed;}
+
+.timer{
+font-weight:bold;
+color:#d10000;
+margin-top:5px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+<h2>🟣 Admin Dashboard</h2>
+<button onclick="load()">🔄 Charger paiements</button>
+<div id="list"></div>
+</div>
+
+<script>
+
+const SUPABASE_URL = "https://gkqlmpkmzfvurkzgrjlm.supabase.co";
+const SUPABASE_KEY = "sb_publishable_TpKfbr8y19-DzT9dQvlr5Q_2MR-ciXr";
+
+// 🔄 LOAD
+async function load(){
+
+const res = await fetch(`${SUPABASE_URL}/rest/v1/payments?select=*`,{
+headers:{
+apikey:SUPABASE_KEY,
+Authorization:`Bearer ${SUPABASE_KEY}`
+}
+});
+
+const data = await res.json();
+
+console.log("DATA:", data);
+
+let html = "";
+
+data.forEach(p=>{
+
+const isConfirmed = p.status === "confirmé";
+
+// ⏳ CALCUL TIMER
+let timerText = "";
+
+if(p.expires_at){
+
+const now = new Date();
+const exp = new Date(p.expires_at);
+const diff = exp - now;
+
+if(diff > 0){
+
+const m = Math.floor(diff / 60000);
+const s = Math.floor((diff % 60000) / 1000);
+
+timerText = `⏳ ${m}m ${s}s restant`;
+
+}else{
+timerText = "❌ expiré";
+}
+
+}else{
+timerText = "—";
+}
+
+html += `
+<div class="item">
+<div>
+📞 ${p.phone}<br>
+Status: ${isConfirmed ? "✔ confirmé" : "⏳ en attente"}<br>
+Code: ${p.code ? p.code : "—"}<br>
+<div class="timer">${timerText}</div>
+</div>
+
+<div>
+<button class="ok"
+onclick="confirmPay('${p.id}')"
+${isConfirmed ? "disabled" : ""}>
+✔ Confirmer
+</button>
+</div>
+</div>
+`;
+
+});
+
+document.getElementById("list").innerHTML = html;
+}
+
+// ✔ CONFIRMER
+async function confirmPay(id){
+
+const check = await fetch(`${SUPABASE_URL}/rest/v1/payments?id=eq.${id}`,{
+headers:{
+apikey:SUPABASE_KEY,
+Authorization:`Bearer ${SUPABASE_KEY}`
+}
+});
+
+const checkData = await check.json();
+
+if(!checkData || checkData.length === 0){
+alert("Erreur : paiement introuvable");
+return;
+}
+
+if(checkData[0].status === "confirmé"){
+alert("Déjà confirmé ✔");
+return;
+}
+
+// CODE + EXPIRATION
+const code = Math.random().toString(36).substring(2,8).toUpperCase();
+const expires = new Date(Date.now() + 2*60*60*1000);
+
+// UPDATE Supabase
+const res = await fetch(`${SUPABASE_URL}/rest/v1/payments?id=eq.${id}`,{
+method:"PATCH",
+headers:{
+apikey:SUPABASE_KEY,
+Authorization:`Bearer ${SUPABASE_KEY}`,
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+status:"confirmé",
+code:code,
+expires_at:expires.toISOString()
+})
+});
+
+console.log(await res.text());
+
+alert("Code généré : " + code);
+
+load();
+}
+
+load();
+
+</script>
+
+</body>
+</html>

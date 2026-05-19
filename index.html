@@ -19,8 +19,16 @@ input{width:100%;padding:10px;margin-top:10px;box-sizing:border-box;border-radiu
 <div id="topcode"></div>
 <div id="timer"></div>
 
-<!-- 📘 SITE DIRECT -->
-<div class="box" id="siteBox">
+<!-- 🔐 LOGIN -->
+<div id="loginBox" class="box">
+<h2>🔐 Connexion</h2>
+<p>Entre ton numéro pour continuer.</p>
+<input id="loginPhone" placeholder="Entrer votre numéro">
+<button onclick="connexion()">Continuer</button>
+</div>
+
+<!-- 📘 SITE -->
+<div class="box" id="siteBox" style="display:none;">
 <h2>📘 Accès PDF</h2>
 <h3>💰 Paiement Orange Money</h3>
 <p style="background:#fff3cd; padding:10px; border-radius:8px;">
@@ -32,17 +40,18 @@ Puis revenez cliquer sur <b>✔ J’ai payé</b> pour recevoir votre code.
 <h3>🔑 Entrer code</h3>
 <input id="code" placeholder="Code reçu">
 <button onclick="verifier()">Accéder PDF</button>
+<button onclick="deconnexion()" style="background:red; color:white;">Déconnexion</button>
 </div>
 
 <script>
 //////////////////////////////////////////////////
-// CONFIG SUPABASE
+// 🔥 CONFIG SUPABASE
 //////////////////////////////////////////////////
 const SUPABASE_URL = "https://gkqlmpkmzfvurkzgrjlm.supabase.co";
 const SUPABASE_KEY = "sb_publishable_TpKfbr8y19-DzT9dQvlr5Q_2MR-ciXr";
 
 //////////////////////////////////////////////////
-// VARIABLES & SECURE ID
+// 🔥 VARIABLES & SECURE ID
 //////////////////////////////////////////////////
 let countdown;
 let checkInterval;
@@ -70,19 +79,79 @@ function obtenirAppareilID() {
 let appareilID = obtenirAppareilID();
 
 //////////////////////////////////////////////////
-// 🔄 CHARGEMENT AUTOMATIQUE (SANS LOGIN)
+// 🔐 CONNEXION
 //////////////////////////////////////////////////
-window.onload = function(){
+function connexion(){
+    const phone = document.getElementById("loginPhone").value.trim();
+
+    if(!phone){
+        alert("Entre ton numéro ❌");
+        return;
+    }
+
+    if(phone.length < 8){
+        alert("Numéro invalide ❌");
+        return;
+    }
+
+    // Sauvegarde immédiate dans le téléphone pour ne pas le perdre au redémarrage
+    localStorage.setItem("phone", phone);
+
+    document.getElementById("loginBox").style.display="none";
+    document.getElementById("siteBox").style.display="block";
+
     restaurerCode();
     surveillerConfirmation();
 }
 
 //////////////////////////////////////////////////
-// 🔄 RESTAURER CODE DEPUIS SUPABASE (PAR APPAREIL)
+// 🔓 DECONNEXION
+//////////////////////////////////////////////////
+function deconnexion(){
+    localStorage.removeItem("phone");
+
+    document.getElementById("loginBox").style.display="block";
+    document.getElementById("siteBox").style.display="none";
+    document.getElementById("topcode").style.display="none";
+    document.getElementById("timer").style.display="none";
+    document.getElementById("code").value="";
+
+    const oldBtn1 = document.querySelector(".downloadBtn");
+    if(oldBtn1){ oldBtn1.remove(); }
+
+    clearInterval(checkInterval);
+    clearInterval(countdown);
+    timerStarted = false;
+}
+
+//////////////////////////////////////////////////
+// 🔄 RESTAURER SESSION (S'exécute quand le tel se rallume)
+//////////////////////////////////////////////////
+window.onload = function(){
+    const phone = localStorage.getItem("phone");
+
+    if(phone){
+        // Si le numéro existe dans le téléphone, on saute l'écran de login directement
+        document.getElementById("loginBox").style.display="none";
+        document.getElementById("siteBox").style.display="block";
+        restaurerCode();
+        surveillerConfirmation();
+    }else{
+        document.getElementById("loginBox").style.display="block";
+        document.getElementById("siteBox").style.display="none";
+    }
+}
+
+//////////////////////////////////////////////////
+// 🔄 RESTAURER LE CODE RECU DEPUIS SUPABASE
 //////////////////////////////////////////////////
 async function restaurerCode(){
+    const phone = localStorage.getItem("phone");
+    if(!phone) return;
+
+    // On demande à Supabase s'il y a un forfait actif pour ce numéro
     const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/payments?device_id=eq.${appareilID}&status=eq.confirmé&select=*`,
+        `${SUPABASE_URL}/rest/v1/payments?phone=eq.${phone}&status=eq.confirmé&select=*`,
         {
             headers:{
                 apikey:SUPABASE_KEY,
@@ -96,6 +165,7 @@ async function restaurerCode(){
 
     const p = data[data.length - 1];
 
+    // Vérification mathématique si le temps restant est toujours valide
     if(new Date(p.expires_at) > new Date()){
         document.getElementById("topcode").style.display="block";
         document.getElementById("topcode").innerHTML = "🔑 Code actif : " + p.code;
@@ -109,13 +179,20 @@ async function restaurerCode(){
 }
 
 //////////////////////////////////////////////////
-// 💰 INITIALISER UN PAIEMENT (LOCKED SUR L'APPAREIL)
+// 💰 PAYER
 //////////////////////////////////////////////////
 async function payer(){
+    const phone = localStorage.getItem("phone");
+
+    if(!phone){
+        alert("Reconnecte-toi ❌");
+        return;
+    }
+
     document.getElementById("payBtn").disabled = true;
 
     const check = await fetch(
-        `${SUPABASE_URL}/rest/v1/payments?device_id=eq.${appareilID}&status=eq.en attente`,
+        `${SUPABASE_URL}/rest/v1/payments?phone=eq.${phone}&status=eq.en attente`,
         {
             headers:{
                 apikey:SUPABASE_KEY,
@@ -142,7 +219,7 @@ async function payer(){
                 "Content-Type":"application/json"
             },
             body:JSON.stringify({
-                device_id: appareilID,
+                phone:phone,
                 status:"en attente",
                 created_at: new Date().toISOString()
             })
@@ -154,14 +231,17 @@ async function payer(){
 }
 
 //////////////////////////////////////////////////
-// 🔄 SURVEILLER CONFIRMATION DE PAIEMENT
+// 🔄 SURVEILLER CONFIRMATION
 //////////////////////////////////////////////////
 function surveillerConfirmation(){
     clearInterval(checkInterval);
 
     checkInterval = setInterval(async ()=>{
+        const phone = localStorage.getItem("phone");
+        if(!phone) return;
+
         const res = await fetch(
-            `${SUPABASE_URL}/rest/v1/payments?device_id=eq.${appareilID}&status=eq.confirmé&select=*`,
+            `${SUPABASE_URL}/rest/v1/payments?phone=eq.${phone}&status=eq.confirmé&select=*`,
             {
                 headers:{
                     apikey:SUPABASE_KEY,
@@ -181,6 +261,12 @@ function surveillerConfirmation(){
             return;
         }
 
+        if(p.device_id && p.device_id !== appareilID){
+            alert("Compte utilisé sur un autre appareil ❌");
+            deconnexion();
+            return;
+        }
+
         if(derniereVerification === p.code) return;
         derniereVerification = p.code;
 
@@ -193,11 +279,11 @@ function surveillerConfirmation(){
             timerStarted = true;
         }
 
-    }, 10000);
+    },10000);
 }
 
 //////////////////////////////////////////////////
-// 🔑 VERIFIER LE CODE ENTRÉ PAR L'UTILISATEUR
+// 🔑 VERIFIER
 //////////////////////////////////////////////////
 async function verifier(){
     if(essais >= 5){
@@ -206,10 +292,15 @@ async function verifier(){
     }
 
     const code = document.getElementById("code").value.trim();
+    const phone = localStorage.getItem("phone");
 
-    // Recherche de la ligne confirmée correspondant à ce code ET à cet appareil
+    if(!phone){
+        alert("Reconnecte-toi ❌");
+        return;
+    }
+
     const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/payments?device_id=eq.${appareilID}&code=eq.${code}&status=eq.confirmé`,
+        `${SUPABASE_URL}/rest/v1/payments?phone=eq.${phone}&code=eq.${code}&status=eq.confirmé`,
         {
             headers:{
                 apikey:SUPABASE_KEY,
@@ -228,6 +319,11 @@ async function verifier(){
 
     const p = data[0];
 
+    if(p.device_id && p.device_id !== appareilID){
+        alert("Compte déjà utilisé ailleurs ❌");
+        return;
+    }
+
     if(new Date(p.expires_at) < new Date()){
         alert("Code expiré ❌");
         document.getElementById("code").value="";
@@ -235,6 +331,21 @@ async function verifier(){
     }
 
     essais = 0;
+
+    await fetch(
+        `${SUPABASE_URL}/rest/v1/payments?id=eq.${p.id}`,
+        {
+            method:"PATCH",
+            headers:{
+                apikey:SUPABASE_KEY,
+                Authorization: `Bearer ${SUPABASE_KEY}`,
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                device_id:appareilID
+            })
+        }
+    );
 
     startTimer(p.expires_at);
     alert("Accès autorisé ✔");
@@ -277,11 +388,11 @@ async function verifier(){
         }; 
 
         document.body.appendChild(btn);
-    }, 1000);
+    },1000);
 } 
 
 //////////////////////////////////////////////////
-// 🔒 OUVERTURE DU PDF
+// 🔒 PDF
 //////////////////////////////////////////////////
 function ouvrirPdfProtege(expireDate){
     if(new Date(expireDate) < new Date()){
@@ -292,7 +403,7 @@ function ouvrirPdfProtege(expireDate){
 }
 
 //////////////////////////////////////////////////
-// ⏳ GESTIONNAIRE DU COMPTE À REBOURS
+// ⏳ TIMER
 //////////////////////////////////////////////////
 function startTimer(expireDate){
     clearInterval(countdown);
@@ -307,10 +418,10 @@ function startTimer(expireDate){
             document.getElementById("timer").innerHTML = "❌ Code expiré";
             document.getElementById("topcode").style.display="none";
             document.getElementById("code").value="";
-            
+
             const oldBtn3 = document.querySelector(".downloadBtn");
             if(oldBtn3){ oldBtn3.remove(); }
-            
+
             timerStarted = false;
             clearInterval(countdown);
             return;
@@ -321,7 +432,7 @@ function startTimer(expireDate){
         const s = Math.floor((diff%60000)/1000);
 
         document.getElementById("timer").innerHTML = "⏳ Expire dans " + h + "h " + m + "m " + s + "s";
-    }, 1000);
+    },1000);
 }
 </script>
 

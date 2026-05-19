@@ -1,184 +1,109 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Accès PDF</title>
-
-<meta name="google-site-verification"
-content="v1n-U1ZbQ_z94Hxt0NyvesUKsW1mK5yBPT3q6O8in4c" />
-
-<style>
-
-body{
-font-family:Arial;
-background:#f4f4f4;
-padding:10px;
-margin:0;
-}
-
-.box{
-width:95%;
-max-width:600px;
-margin:20px auto;
-background:white;
-padding:20px;
-border-radius:10px;
-box-shadow:0 0 10px rgba(0,0,0,0.2);
-}
-
-button{
-padding:10px;
-width:100%;
-margin-top:10px;
-cursor:pointer;
-border:none;
-border-radius:8px;
-font-size:16px;
-}
-
-input{
-width:100%;
-padding:10px;
-margin-top:10px;
-box-sizing:border-box;
-border-radius:8px;
-border:1px solid #ccc;
-font-size:16px;
-}
-
-#topcode{
-position:fixed;
-top:10px;
-right:10px;
-background:black;
-color:white;
-padding:10px;
-border-radius:10px;
-display:none;
-z-index:999;
-font-size:14px;
-}
-
-#timer{
-position:fixed;
-top:60px;
-right:10px;
-background:red;
-color:white;
-padding:10px;
-border-radius:10px;
-display:none;
-z-index:999;
-font-size:14px;
-}
-
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accès PDF</title>
+    <meta name="google-site-verification" content="v1n-U1ZbQ_z94Hxt0NyvesUKsW1mK5yBPT3q6O8in4c" />
+    <style>
+        body{
+            font-family:Arial;
+            background:#f4f4f4;
+            padding:10px;
+            margin:0;
+        }
+        .box{
+            width:95%;
+            max-width:600px;
+            margin:20px auto;
+            background:white;
+            padding:20px;
+            border-radius:10px;
+            box-shadow:0 0 10px rgba(0,0,0,0.2);
+        }
+        button{
+            padding:10px;
+            width:100%;
+            margin-top:10px;
+            cursor:pointer;
+            border:none;
+            border-radius:8px;
+            font-size:16px;
+        }
+        input{
+            width:100%;
+            padding:10px;
+            margin-top:10px;
+            box-sizing:border-box;
+            border-radius:8px;
+            border:1px solid #ccc;
+            font-size:16px;
+        }
+        #topcode{
+            position:fixed;
+            top:10px;
+            right:10px;
+            background:black;
+            color:white;
+            padding:10px;
+            border-radius:10px;
+            display:none;
+            z-index:999;
+            font-size:14px;
+        }
+        #timer{
+            position:fixed;
+            top:60px;
+            right:10px;
+            background:red;
+            color:white;
+            padding:10px;
+            border-radius:10px;
+            display:none;
+            z-index:999;
+            font-size:14px;
+        }
+    </style>
 </head>
-
 <body>
 
 <div id="topcode"></div>
 <div id="timer"></div>
 
 <!-- 🔐 LOGIN -->
-
 <div id="loginBox" class="box">
-
-<h2>🔐 Connexion</h2>
-
-<p>
-Entre ton numéro pour continuer.
-</p>
-
-<input
-id="loginPhone"
-placeholder="Entrer votre numéro">
-
-<button onclick="connexion()">
-
-Continuer
-
-</button>
-
+    <h2>🔐 Connexion</h2>
+    <p>Entre ton numéro pour continuer.</p>
+    <input id="loginPhone" placeholder="Entrer votre numéro">
+    <button onclick="connexion()">Continuer</button>
 </div>
 
 <!-- 📘 SITE -->
-
-<div
-class="box"
-id="siteBox"
-style="display:none;">
-
-<h2>📘 Accès PDF</h2>
-
-<h3>💰 Paiement Orange Money</h3>
-
-<p style="
-background:#fff3cd;
-padding:10px;
-border-radius:8px;">
-
-📌 Composez :
-<b>*144*10*44295613*300#</b>
-
-<br><br>
-
-Puis revenez cliquer sur
-<b>✔ J’ai payé</b>
-pour recevoir votre code.
-
-</p>
-
-<button
-id="payBtn"
-onclick="payer()">
-
-✔ J’ai payé
-
-</button>
-
-<hr>
-
-<h3>🔑 Entrer code</h3>
-
-<input
-id="code"
-placeholder="Code reçu">
-
-<button onclick="verifier()">
-
-Accéder PDF
-
-</button>
-
-<button
-onclick="deconnexion()"
-style="
-background:red;
-color:white;">
-
-Déconnexion
-
-</button>
-
+<div class="box" id="siteBox" style="display:none;">
+    <h2>📘 Accès PDF</h2>
+    <h3>💰 Paiement Orange Money</h3>
+    <p style="background:#fff3cd; padding:10px; border-radius:8px;">
+        📌 Composez : <b>*144*10*44295613*300#</b><br><br>
+        Puis revenez cliquer sur <b>✔ J’ai payé</b> pour recevoir votre code.
+    </p>
+    <button id="payBtn" onclick="payer()">✔ J’ai payé</button>
+    <hr>
+    <h3>🔑 Entrer code</h3>
+    <input id="code" placeholder="Code reçu">
+    <button onclick="verifier()">Accéder PDF</button>
+    <button onclick="deconnexion()" style="background:red; color:white;">Déconnexion</button>
 </div>
 
 <script>
-
 //////////////////////////////////////////////////
 // 🔥 CONFIG
 //////////////////////////////////////////////////
-
 const SUPABASE_URL = "https://gkqlmpkmzfvurkzgrjlm.supabase.co";
 const SUPABASE_KEY = "sb_publishable_TpKfbr8y19-DzT9dQvlr5Q_2MR-ciXr";
 
 //////////////////////////////////////////////////
 // 🔥 VARIABLES
 //////////////////////////////////////////////////
-
 let countdown;
 let checkInterval;
 let essais = 0;
@@ -191,7 +116,6 @@ localStorage.setItem("appareilID", appareilID);
 //////////////////////////////////////////////////
 // 🔐 CONNEXION
 //////////////////////////////////////////////////
-
 function connexion(){
     const phone = document.getElementById("loginPhone").value.trim();
 
@@ -217,7 +141,6 @@ function connexion(){
 //////////////////////////////////////////////////
 // 🔓 DECONNEXION
 //////////////////////////////////////////////////
-
 function deconnexion(){
     localStorage.removeItem("phone");
 
@@ -237,7 +160,6 @@ function deconnexion(){
 //////////////////////////////////////////////////
 // 🔄 RESTAURER SESSION
 //////////////////////////////////////////////////
-
 window.onload = function(){
     const phone = localStorage.getItem("phone");
 
@@ -255,7 +177,6 @@ window.onload = function(){
 //////////////////////////////////////////////////
 // 🔄 RESTAURER CODE
 //////////////////////////////////////////////////
-
 async function restaurerCode(){
     const phone = localStorage.getItem("phone");
     if(!phone) return;
@@ -284,13 +205,12 @@ async function restaurerCode(){
             startTimer(p.expires_at);
             timerStarted = true;
         }
-    } // ✅ Correction : Fermeture du IF
-} // ✅ Correction : Fermeture de la fonction restaurerCode()
+    }
+}
 
 //////////////////////////////////////////////////
 // 💰 PAYER
 //////////////////////////////////////////////////
-
 async function payer(){
     const phone = localStorage.getItem("phone");
 
@@ -343,7 +263,6 @@ async function payer(){
 //////////////////////////////////////////////////
 // 🔄 SURVEILLER CONFIRMATION
 //////////////////////////////////////////////////
-
 function surveillerConfirmation(){
     clearInterval(checkInterval);
 
@@ -372,26 +291,14 @@ function surveillerConfirmation(){
             return;
         }
 
-        //////////////////////////////////////////////////
-        // 🔥 ANTI MULTI APPAREIL
-        //////////////////////////////////////////////////
-
         if(p.device_id && p.device_id !== appareilID){
             alert("Compte utilisé sur un autre appareil ❌");
             deconnexion();
             return;
         }
 
-        //////////////////////////////////////////////////
-        // 🔥 EVITER REDÉMARRAGE TIMER
-        //////////////////////////////////////////////////
-
         if(derniereVerification === p.code) return;
         derniereVerification = p.code;
-
-        //////////////////////////////////////////////////
-        // 🔥 AFFICHAGE AUTO
-        //////////////////////////////////////////////////
 
         document.getElementById("topcode").style.display="block";
         document.getElementById("topcode").innerHTML = "🔑 Code actif : " + p.code;
@@ -408,7 +315,6 @@ function surveillerConfirmation(){
 //////////////////////////////////////////////////
 // 🔑 VERIFIER
 //////////////////////////////////////////////////
-
 async function verifier(){
     if(essais >= 5){
         alert("Trop de tentatives ❌");
@@ -443,18 +349,10 @@ async function verifier(){
 
     const p = data[0];
 
-    //////////////////////////////////////////////////
-    // 🔥 MULTI APPAREIL
-    //////////////////////////////////////////////////
-
     if(p.device_id && p.device_id !== appareilID){
         alert("Compte déjà utilisé ailleurs ❌");
         return;
     }
-
-    //////////////////////////////////////////////////
-    // ⛔ EXPIRÉ
-    //////////////////////////////////////////////////
 
     if(new Date(p.expires_at) < new Date()){
         alert("Code expiré ❌");
@@ -462,15 +360,7 @@ async function verifier(){
         return;
     }
 
-    //////////////////////////////////////////////////
-    // 🔥 RESET ESSAIS
-    //////////////////////////////////////////////////
-
     essais = 0;
-
-    //////////////////////////////////////////////////
-    // 🔥 ENREGISTRER APPAREIL
-    //////////////////////////////////////////////////
 
     await fetch(
         `${SUPABASE_URL}/rest/v1/payments?id=eq.${p.id}`,
@@ -487,40 +377,15 @@ async function verifier(){
         }
     );
 
-    //////////////////////////////////////////////////
-    // ⏳ TIMER
-    //////////////////////////////////////////////////
-
     startTimer(p.expires_at);
-
-    //////////////////////////////////////////////////
-    // ✔ ACCÈS
-    //////////////////////////////////////////////////
-
     alert("Accès autorisé ✔");
-
-    //////////////////////////////////////////////////
-    // 🔑 CODE
-    //////////////////////////////////////////////////
 
     document.getElementById("topcode").style.display="block";
     document.getElementById("topcode").innerHTML = "🔑 Code actif : " + p.code;
 
-    //////////////////////////////////////////////////
-    // 📘 OUVRIR PDF
-    //////////////////////////////////////////////////
-
     ouvrirPdfProtege(p.expires_at);
 
-    //////////////////////////////////////////////////
-    // 🔥 SUPPRIMER ANCIEN BOUTON
-    //////////////////////////////////////////////////
-
     document.querySelector(".downloadBtn")?.remove();
-
-    //////////////////////////////////////////////////
-    // 🔽 BOUTON DOWNLOAD
-    //////////////////////////////////////////////////
 
     setTimeout(()=>{
         const btn = document.createElement("button");
@@ -558,7 +423,6 @@ async function verifier(){
 //////////////////////////////////////////////////
 // 🔒 PDF
 //////////////////////////////////////////////////
-
 function ouvrirPdfProtege(expireDate){
     if(new Date(expireDate) < new Date()){
         alert("Code expiré ❌");
@@ -570,12 +434,11 @@ function ouvrirPdfProtege(expireDate){
 //////////////////////////////////////////////////
 // ⏳ TIMER
 //////////////////////////////////////////////////
-
 function startTimer(expireDate){
     clearInterval(countdown);
     const exp = new Date(expireDate);
 
-    document.getElementById("timer").style.style.display="block";
+    document.getElementById("timer").style.display="block";
 
     countdown = setInterval(()=>{
         const diff = exp - new Date();
@@ -596,328 +459,6 @@ function startTimer(expireDate){
 
         document.getElementById("timer").innerHTML = "⏳ Expire dans " + h + "h " + m + "m " + s + "s";
     },1000);
-}
-</script>
-
-//////////////////////////////////////////////////
-// 🔑 VERIFIER
-//////////////////////////////////////////////////
-
-async function verifier(){
-
-if(essais >= 5){
-
-alert("Trop de tentatives ❌");
-
-return;
-
-}
-
-const code =
-document.getElementById("code")
-.value.trim();
-
-const phone =
-localStorage.getItem("phone");
-
-if(!phone){
-
-alert("Reconnecte-toi ❌");
-
-return;
-
-}
-
-const res =
-await fetch(
-
-`${SUPABASE_URL}/rest/v1/payments?phone=eq.${phone}&code=eq.${code}&status=eq.confirmé`,
-
-{
-headers:{
-apikey:SUPABASE_KEY,
-Authorization:
-`Bearer ${SUPABASE_KEY}`
-}
-}
-
-);
-
-const data =
-await res.json();
-
-if(!data || data.length===0){
-
-essais++;
-
-alert("Code invalide ❌");
-
-return;
-
-}
-
-const p = data[0];
-
-//////////////////////////////////////////////////
-// 🔥 MULTI APPAREIL
-//////////////////////////////////////////////////
-
-if(
-p.device_id
-&&
-p.device_id !== appareilID
-){
-
-alert(
-"Compte déjà utilisé ailleurs ❌"
-);
-
-return;
-
-}
-
-//////////////////////////////////////////////////
-// ⛔ EXPIRÉ
-//////////////////////////////////////////////////
-
-if(new Date(p.expires_at)
-< new Date()){
-
-alert("Code expiré ❌");
-
-document.getElementById("code")
-.value="";
-
-return;
-
-}
-
-//////////////////////////////////////////////////
-// 🔥 RESET ESSAIS
-//////////////////////////////////////////////////
-
-essais = 0;
-
-//////////////////////////////////////////////////
-// 🔥 ENREGISTRER APPAREIL
-//////////////////////////////////////////////////
-
-await fetch(
-
-`${SUPABASE_URL}/rest/v1/payments?id=eq.${p.id}`,
-
-{
-method:"PATCH",
-
-headers:{
-apikey:SUPABASE_KEY,
-Authorization:
-`Bearer ${SUPABASE_KEY}`,
-"Content-Type":"application/json"
-},
-
-body:JSON.stringify({
-device_id:appareilID
-})
-
-}
-
-);
-
-//////////////////////////////////////////////////
-// ⏳ TIMER
-//////////////////////////////////////////////////
-
-startTimer(
-p.expires_at
-);
-
-//////////////////////////////////////////////////
-// ✔ ACCÈS
-//////////////////////////////////////////////////
-
-alert("Accès autorisé ✔");
-
-//////////////////////////////////////////////////
-// 🔑 CODE
-//////////////////////////////////////////////////
-
-document.getElementById("topcode")
-.style.display="block";
-
-document.getElementById("topcode")
-.innerHTML =
-"🔑 Code actif : "
-+ p.code;
-
-//////////////////////////////////////////////////
-// 📘 OUVRIR PDF
-//////////////////////////////////////////////////
-
-ouvrirPdfProtege(
-p.expires_at
-);
-
-//////////////////////////////////////////////////
-// 🔥 SUPPRIMER ANCIEN BOUTON
-//////////////////////////////////////////////////
-
-document.querySelector(".downloadBtn")
-?.remove();
-
-//////////////////////////////////////////////////
-// 🔽 BOUTON DOWNLOAD
-//////////////////////////////////////////////////
-
-setTimeout(()=>{
-
-const btn =
-document.createElement("button");
-
-btn.className =
-"downloadBtn";
-
-btn.innerText =
-"⬇ Télécharger PDF";
-
-btn.style.position="fixed";
-
-btn.style.bottom="20px";
-
-btn.style.left="50%";
-
-btn.style.transform=
-"translateX(-50%)";
-
-btn.style.padding="15px";
-
-btn.style.background="green";
-
-btn.style.color="white";
-
-btn.style.border="none";
-
-btn.style.borderRadius="10px";
-
-btn.style.zIndex="9999";
-
-btn.onclick = ()=>{
-
-if(new Date(p.expires_at)
-< new Date()){
-
-alert("Code expiré ❌");
-
-btn.remove();
-
-return;
-
-}
-
-const a =
-document.createElement("a");
-
-a.href =
-"formation2026.pdf?nocache="
-+ Date.now();
-
-a.download =
-"formation2026.pdf";
-
-a.click();
-
-}; // ✅ fermeture de btn.onclick
-
-document.body.appendChild(btn);
-
-},1000);
-
-} // ✅ fermeture de verifier()
-
-//////////////////////////////////////////////////
-// 🔒 PDF
-//////////////////////////////////////////////////
-
-function ouvrirPdfProtege(expireDate){
-
-if(new Date(expireDate)
-< new Date()){
-
-alert("Code expiré ❌");
-
-return;
-
-}
-
-window.open(
-"formation2026.pdf?nocache=" + Date.now(),
-"_blank"
-);
-
-}
-
-//////////////////////////////////////////////////
-// ⏳ TIMER
-//////////////////////////////////////////////////
-
-function startTimer(expireDate){
-
-clearInterval(countdown);
-
-const exp =
-new Date(expireDate);
-
-document.getElementById("timer")
-.style.display="block";
-
-countdown =
-setInterval(()=>{
-
-const diff =
-exp - new Date();
-
-if(diff <= 0){
-
-document.getElementById("timer")
-.innerHTML =
-"❌ Code expiré";
-
-document.getElementById("topcode")
-.style.display="none";
-
-document.getElementById("code")
-.value="";
-
-document.querySelector(".downloadBtn")
-?.remove();
-
-timerStarted = false;
-
-clearInterval(countdown);
-
-return;
-
-}
-
-const h =
-Math.floor(diff/3600000);
-
-const m =
-Math.floor((diff%3600000)/60000);
-
-const s =
-Math.floor((diff%60000)/1000);
-
-document.getElementById("timer")
-.innerHTML =
-
-"⏳ Expire dans "
-+ h + "h "
-+ m + "m "
-+ s + "s";
-
-},1000);
-
 }
 </script>
 

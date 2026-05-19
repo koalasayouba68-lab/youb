@@ -150,7 +150,9 @@ function deconnexion(){
     document.getElementById("timer").style.display="none";
     document.getElementById("code").value="";
 
-    document.querySelector(".downloadBtn")?.remove();
+    // Correction ? ici
+    const oldBtn1 = document.querySelector(".downloadBtn");
+    if(oldBtn1){ oldBtn1.remove(); }
 
     clearInterval(checkInterval);
     clearInterval(countdown);
@@ -385,7 +387,9 @@ async function verifier(){
 
     ouvrirPdfProtege(p.expires_at);
 
-    document.querySelector(".downloadBtn")?.remove();
+    // Correction ? ici
+    const oldBtn2 = document.querySelector(".downloadBtn");
+    if(oldBtn2){ oldBtn2.remove(); }
 
     setTimeout(()=>{
         const btn = document.createElement("button");
@@ -447,7 +451,11 @@ function startTimer(expireDate){
             document.getElementById("timer").innerHTML = "❌ Code expiré";
             document.getElementById("topcode").style.display="none";
             document.getElementById("code").value="";
-            document.querySelector(".downloadBtn")?.remove();
+            
+            // Correction ? ici
+            const oldBtn3 = document.querySelector(".downloadBtn");
+            if(oldBtn3){ oldBtn3.remove(); }
+            
             timerStarted = false;
             clearInterval(countdown);
             return;

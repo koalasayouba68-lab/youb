@@ -172,11 +172,8 @@ Déconnexion
 // 🔥 CONFIG
 //////////////////////////////////////////////////
 
-const SUPABASE_URL =
-"https://gkqlmpkmzfvurkzgrjlm.supabase.co";
-
-const SUPABASE_KEY =
-"sb_publishable_TpKfbr8y19-DzT9dQvlr5Q_2MR-ciXr";
+const SUPABASE_URL = "https://gkqlmpkmzfvurkzgrjlm.supabase.co";
+const SUPABASE_KEY = "sb_publishable_TpKfbr8y19-DzT9dQvlr5Q_2MR-ciXr";
 
 //////////////////////////////////////////////////
 // 🔥 VARIABLES
@@ -188,56 +185,33 @@ let essais = 0;
 let timerStarted = false;
 let derniereVerification = "";
 
-let appareilID =
-localStorage.getItem("appareilID")
-|| crypto.randomUUID();
-
-localStorage.setItem(
-"appareilID",
-appareilID
-);
+let appareilID = localStorage.getItem("appareilID") || crypto.randomUUID();
+localStorage.setItem("appareilID", appareilID);
 
 //////////////////////////////////////////////////
 // 🔐 CONNEXION
 //////////////////////////////////////////////////
 
 function connexion(){
+    const phone = document.getElementById("loginPhone").value.trim();
 
-const phone =
-document.getElementById("loginPhone")
-.value.trim();
+    if(!phone){
+        alert("Entre ton numéro ❌");
+        return;
+    }
 
-if(!phone){
+    if(phone.length < 8){
+        alert("Numéro invalide ❌");
+        return;
+    }
 
-alert("Entre ton numéro ❌");
+    localStorage.setItem("phone", phone);
 
-return;
+    document.getElementById("loginBox").style.display="none";
+    document.getElementById("siteBox").style.display="block";
 
-}
-
-if(phone.length < 8){
-
-alert("Numéro invalide ❌");
-
-return;
-
-}
-
-localStorage.setItem(
-"phone",
-phone
-);
-
-document.getElementById("loginBox")
-.style.display="none";
-
-document.getElementById("siteBox")
-.style.display="block";
-
-restaurerCode();
-
-surveillerConfirmation();
-
+    restaurerCode();
+    surveillerConfirmation();
 }
 
 //////////////////////////////////////////////////
@@ -245,33 +219,19 @@ surveillerConfirmation();
 //////////////////////////////////////////////////
 
 function deconnexion(){
+    localStorage.removeItem("phone");
 
-localStorage.removeItem("phone");
+    document.getElementById("loginBox").style.display="block";
+    document.getElementById("siteBox").style.display="none";
+    document.getElementById("topcode").style.display="none";
+    document.getElementById("timer").style.display="none";
+    document.getElementById("code").value="";
 
-document.getElementById("loginBox")
-.style.display="block";
+    document.querySelector(".downloadBtn")?.remove();
 
-document.getElementById("siteBox")
-.style.display="none";
-
-document.getElementById("topcode")
-.style.display="none";
-
-document.getElementById("timer")
-.style.display="none";
-
-document.getElementById("code")
-.value="";
-
-document.querySelector(".downloadBtn")
-?.remove();
-
-clearInterval(checkInterval);
-
-clearInterval(countdown);
-
-timerStarted = false;
-
+    clearInterval(checkInterval);
+    clearInterval(countdown);
+    timerStarted = false;
 }
 
 //////////////////////////////////////////////////
@@ -279,32 +239,17 @@ timerStarted = false;
 //////////////////////////////////////////////////
 
 window.onload = function(){
+    const phone = localStorage.getItem("phone");
 
-const phone =
-localStorage.getItem("phone");
-
-if(phone){
-
-document.getElementById("loginBox")
-.style.display="none";
-
-document.getElementById("siteBox")
-.style.display="block";
-
-restaurerCode();
-
-surveillerConfirmation();
-
-}else{
-
-document.getElementById("loginBox")
-.style.display="block";
-
-document.getElementById("siteBox")
-.style.display="none";
-
-}
-
+    if(phone){
+        document.getElementById("loginBox").style.display="none";
+        document.getElementById("siteBox").style.display="block";
+        restaurerCode();
+        surveillerConfirmation();
+    }else{
+        document.getElementById("loginBox").style.display="block";
+        document.getElementById("siteBox").style.display="none";
+    }
 }
 
 //////////////////////////////////////////////////
@@ -312,147 +257,87 @@ document.getElementById("siteBox")
 //////////////////////////////////////////////////
 
 async function restaurerCode(){
+    const phone = localStorage.getItem("phone");
+    if(!phone) return;
 
-const phone =
-localStorage.getItem("phone");
+    const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/payments?phone=eq.${phone}&status=eq.confirmé&select=*`,
+        {
+            headers:{
+                apikey:SUPABASE_KEY,
+                Authorization: `Bearer ${SUPABASE_KEY}`
+            }
+        }
+    );
 
-if(!phone) return;
+    const data = await res.json();
+    if(!data || data.length===0) return;
 
-const res =
-await fetch(
+    const p = data[data.length - 1];
 
-`${SUPABASE_URL}/rest/v1/payments?phone=eq.${phone}&status=eq.confirmé&select=*`,
+    if(new Date(p.expires_at) > new Date()){
+        document.getElementById("topcode").style.display="block";
+        document.getElementById("topcode").innerHTML = "🔑 Code actif : " + p.code;
+        document.getElementById("code").value = p.code;
 
-{
-headers:{
-apikey:SUPABASE_KEY,
-Authorization:
-`Bearer ${SUPABASE_KEY}`
-}
-}
-
-);
-
-const data =
-await res.json();
-
-if(!data || data.length===0)
-return;
-
-const p =
-data[data.length - 1];
-
-if(new Date(p.expires_at)
-> new Date()){
-
-document.getElementById("topcode")
-.style.display="block";
-
-document.getElementById("topcode")
-.innerHTML =
-"🔑 Code actif : "
-+ p.code;
-
-document.getElementById("code")
-.value = p.code;
-
-if(!timerStarted){
-
-startTimer(
-p.expires_at
-);
-
-timerStarted = true;
-
-}
-
-}
-
-}
+        if(!timerStarted){
+            startTimer(p.expires_at);
+            timerStarted = true;
+        }
+    } // ✅ Correction : Fermeture du IF
+} // ✅ Correction : Fermeture de la fonction restaurerCode()
 
 //////////////////////////////////////////////////
 // 💰 PAYER
 //////////////////////////////////////////////////
 
 async function payer(){
+    const phone = localStorage.getItem("phone");
 
-const phone =
-localStorage.getItem("phone");
+    if(!phone){
+        alert("Reconnecte-toi ❌");
+        return;
+    }
 
-if(!phone){
+    document.getElementById("payBtn").disabled = true;
 
-alert("Reconnecte-toi ❌");
+    const check = await fetch(
+        `${SUPABASE_URL}/rest/v1/payments?phone=eq.${phone}&status=eq.en attente`,
+        {
+            headers:{
+                apikey:SUPABASE_KEY,
+                Authorization: `Bearer ${SUPABASE_KEY}`
+            }
+        }
+    );
 
-return;
+    const oldData = await check.json();
 
-}
+    if(oldData.length > 0){
+        alert("Paiement déjà envoyé ⏳");
+        document.getElementById("payBtn").disabled = false;
+        return;
+    }
 
-document.getElementById("payBtn")
-.disabled = true;
+    await fetch(
+        `${SUPABASE_URL}/rest/v1/payments`,
+        {
+            method:"POST",
+            headers:{
+                apikey:SUPABASE_KEY,
+                Authorization: `Bearer ${SUPABASE_KEY}`,
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                phone:phone,
+                status:"en attente",
+                created_at: new Date().toISOString()
+            })
+        }
+    );
 
-const check =
-await fetch(
-
-`${SUPABASE_URL}/rest/v1/payments?phone=eq.${phone}&status=eq.en attente`,
-
-{
-headers:{
-apikey:SUPABASE_KEY,
-Authorization:
-`Bearer ${SUPABASE_KEY}`
-}
-}
-
-);
-
-const oldData =
-await check.json();
-
-if(oldData.length > 0){
-
-alert("Paiement déjà envoyé ⏳");
-
-document.getElementById("payBtn")
-.disabled = false;
-
-return;
-
-}
-
-await fetch(
-
-`${SUPABASE_URL}/rest/v1/payments`,
-
-{
-method:"POST",
-
-headers:{
-apikey:SUPABASE_KEY,
-Authorization:
-`Bearer ${SUPABASE_KEY}`,
-"Content-Type":"application/json"
-},
-
-body:JSON.stringify({
-
-phone:phone,
-
-status:"en attente",
-
-created_at:
-new Date().toISOString()
-
-})
-
-}
-
-);
-
-alert("Paiement envoyé ✔");
-
-document.getElementById("payBtn")
-.disabled = false;
-
+    alert("Paiement envoyé ✔");
+    document.getElementById("payBtn").disabled = false;
 }
 
 //////////////////////////////////////////////////
@@ -460,115 +345,259 @@ document.getElementById("payBtn")
 //////////////////////////////////////////////////
 
 function surveillerConfirmation(){
+    clearInterval(checkInterval);
 
-clearInterval(checkInterval);
+    checkInterval = setInterval(async ()=>{
+        const phone = localStorage.getItem("phone");
+        if(!phone) return;
 
-checkInterval =
-setInterval(async ()=>{
+        const res = await fetch(
+            `${SUPABASE_URL}/rest/v1/payments?phone=eq.${phone}&status=eq.confirmé&select=*`,
+            {
+                headers:{
+                    apikey:SUPABASE_KEY,
+                    Authorization: `Bearer ${SUPABASE_KEY}`
+                }
+            }
+        );
 
-const phone =
-localStorage.getItem("phone");
+        const data = await res.json();
+        if(!data || data.length===0) return;
 
-if(!phone) return;
+        const p = data[data.length - 1];
 
-const res =
-await fetch(
+        if(new Date(p.expires_at) < new Date()){
+            document.getElementById("topcode").style.display="none";
+            document.getElementById("code").value="";
+            return;
+        }
 
-`${SUPABASE_URL}/rest/v1/payments?phone=eq.${phone}&status=eq.confirmé&select=*`,
+        //////////////////////////////////////////////////
+        // 🔥 ANTI MULTI APPAREIL
+        //////////////////////////////////////////////////
 
-{
-headers:{
-apikey:SUPABASE_KEY,
-Authorization:
-`Bearer ${SUPABASE_KEY}`
-}
-}
+        if(p.device_id && p.device_id !== appareilID){
+            alert("Compte utilisé sur un autre appareil ❌");
+            deconnexion();
+            return;
+        }
 
-);
+        //////////////////////////////////////////////////
+        // 🔥 EVITER REDÉMARRAGE TIMER
+        //////////////////////////////////////////////////
 
-const data =
-await res.json();
+        if(derniereVerification === p.code) return;
+        derniereVerification = p.code;
 
-if(!data || data.length===0)
-return;
+        //////////////////////////////////////////////////
+        // 🔥 AFFICHAGE AUTO
+        //////////////////////////////////////////////////
 
-const p =
-data[data.length - 1];
+        document.getElementById("topcode").style.display="block";
+        document.getElementById("topcode").innerHTML = "🔑 Code actif : " + p.code;
+        document.getElementById("code").value = p.code;
 
-if(new Date(p.expires_at)
-< new Date()){
+        if(!timerStarted){
+            startTimer(p.expires_at);
+            timerStarted = true;
+        }
 
-document.getElementById("topcode")
-.style.display="none";
-
-document.getElementById("code")
-.value="";
-
-return;
-
-}
-
-//////////////////////////////////////////////////
-// 🔥 ANTI MULTI APPAREIL
-//////////////////////////////////////////////////
-
-if(
-p.device_id
-&&
-p.device_id !== appareilID
-){
-
-alert(
-"Compte utilisé sur un autre appareil ❌"
-);
-
-deconnexion();
-
-return;
-
+    },10000);
 }
 
 //////////////////////////////////////////////////
-// 🔥 EVITER REDÉMARRAGE TIMER
+// 🔑 VERIFIER
 //////////////////////////////////////////////////
 
-if(
-derniereVerification
-=== p.code
-)
-return;
+async function verifier(){
+    if(essais >= 5){
+        alert("Trop de tentatives ❌");
+        return;
+    }
 
-derniereVerification =
-p.code;
+    const code = document.getElementById("code").value.trim();
+    const phone = localStorage.getItem("phone");
+
+    if(!phone){
+        alert("Reconnecte-toi ❌");
+        return;
+    }
+
+    const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/payments?phone=eq.${phone}&code=eq.${code}&status=eq.confirmé`,
+        {
+            headers:{
+                apikey:SUPABASE_KEY,
+                Authorization: `Bearer ${SUPABASE_KEY}`
+            }
+        }
+    );
+
+    const data = await res.json();
+
+    if(!data || data.length===0){
+        essais++;
+        alert("Code invalide ❌");
+        return;
+    }
+
+    const p = data[0];
+
+    //////////////////////////////////////////////////
+    // 🔥 MULTI APPAREIL
+    //////////////////////////////////////////////////
+
+    if(p.device_id && p.device_id !== appareilID){
+        alert("Compte déjà utilisé ailleurs ❌");
+        return;
+    }
+
+    //////////////////////////////////////////////////
+    // ⛔ EXPIRÉ
+    //////////////////////////////////////////////////
+
+    if(new Date(p.expires_at) < new Date()){
+        alert("Code expiré ❌");
+        document.getElementById("code").value="";
+        return;
+    }
+
+    //////////////////////////////////////////////////
+    // 🔥 RESET ESSAIS
+    //////////////////////////////////////////////////
+
+    essais = 0;
+
+    //////////////////////////////////////////////////
+    // 🔥 ENREGISTRER APPAREIL
+    //////////////////////////////////////////////////
+
+    await fetch(
+        `${SUPABASE_URL}/rest/v1/payments?id=eq.${p.id}`,
+        {
+            method:"PATCH",
+            headers:{
+                apikey:SUPABASE_KEY,
+                Authorization: `Bearer ${SUPABASE_KEY}`,
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                device_id:appareilID
+            })
+        }
+    );
+
+    //////////////////////////////////////////////////
+    // ⏳ TIMER
+    //////////////////////////////////////////////////
+
+    startTimer(p.expires_at);
+
+    //////////////////////////////////////////////////
+    // ✔ ACCÈS
+    //////////////////////////////////////////////////
+
+    alert("Accès autorisé ✔");
+
+    //////////////////////////////////////////////////
+    // 🔑 CODE
+    //////////////////////////////////////////////////
+
+    document.getElementById("topcode").style.display="block";
+    document.getElementById("topcode").innerHTML = "🔑 Code actif : " + p.code;
+
+    //////////////////////////////////////////////////
+    // 📘 OUVRIR PDF
+    //////////////////////////////////////////////////
+
+    ouvrirPdfProtege(p.expires_at);
+
+    //////////////////////////////////////////////////
+    // 🔥 SUPPRIMER ANCIEN BOUTON
+    //////////////////////////////////////////////////
+
+    document.querySelector(".downloadBtn")?.remove();
+
+    //////////////////////////////////////////////////
+    // 🔽 BOUTON DOWNLOAD
+    //////////////////////////////////////////////////
+
+    setTimeout(()=>{
+        const btn = document.createElement("button");
+        btn.className = "downloadBtn";
+        btn.innerText = "⬇ Télécharger PDF";
+
+        btn.style.position="fixed";
+        btn.style.bottom="20px";
+        btn.style.left="50%";
+        btn.style.transform= "translateX(-50%)";
+        btn.style.padding="15px";
+        btn.style.background="green";
+        btn.style.color="white";
+        btn.style.border="none";
+        btn.style.borderRadius="10px";
+        btn.style.zIndex="9999";
+
+        btn.onclick = ()=>{
+            if(new Date(p.expires_at) < new Date()){
+                alert("Code expiré ❌");
+                btn.remove();
+                return;
+            }
+
+            const a = document.createElement("a");
+            a.href = "formation2026.pdf?nocache=" + Date.now();
+            a.download = "formation2026.pdf";
+            a.click();
+        }; 
+
+        document.body.appendChild(btn);
+    },1000);
+} 
 
 //////////////////////////////////////////////////
-// 🔥 AFFICHAGE AUTO
+// 🔒 PDF
 //////////////////////////////////////////////////
 
-document.getElementById("topcode")
-.style.display="block";
-
-document.getElementById("topcode")
-.innerHTML =
-"🔑 Code actif : "
-+ p.code;
-
-document.getElementById("code")
-.value = p.code;
-
-if(!timerStarted){
-
-startTimer(
-p.expires_at
-);
-
-timerStarted = true;
-
+function ouvrirPdfProtege(expireDate){
+    if(new Date(expireDate) < new Date()){
+        alert("Code expiré ❌");
+        return;
+    }
+    window.open("formation2026.pdf?nocache=" + Date.now(), "_blank");
 }
 
-},10000);
+//////////////////////////////////////////////////
+// ⏳ TIMER
+//////////////////////////////////////////////////
 
+function startTimer(expireDate){
+    clearInterval(countdown);
+    const exp = new Date(expireDate);
+
+    document.getElementById("timer").style.style.display="block";
+
+    countdown = setInterval(()=>{
+        const diff = exp - new Date();
+
+        if(diff <= 0){
+            document.getElementById("timer").innerHTML = "❌ Code expiré";
+            document.getElementById("topcode").style.display="none";
+            document.getElementById("code").value="";
+            document.querySelector(".downloadBtn")?.remove();
+            timerStarted = false;
+            clearInterval(countdown);
+            return;
+        }
+
+        const h = Math.floor(diff/3600000);
+        const m = Math.floor((diff%3600000)/60000);
+        const s = Math.floor((diff%60000)/1000);
+
+        document.getElementById("timer").innerHTML = "⏳ Expire dans " + h + "h " + m + "m " + s + "s";
+    },1000);
 }
+</script>
 
 //////////////////////////////////////////////////
 // 🔑 VERIFIER

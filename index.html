@@ -102,7 +102,7 @@ const SUPABASE_URL = "https://gkqlmpkmzfvurkzgrjlm.supabase.co";
 const SUPABASE_KEY = "sb_publishable_TpKfbr8y19-DzT9dQvlr5Q_2MR-ciXr";
 
 //////////////////////////////////////////////////
-// 🔥 VARIABLES
+// 🔥 VARIABLES & ID APPAREIL SÉCURISÉ
 //////////////////////////////////////////////////
 let countdown;
 let checkInterval;
@@ -110,8 +110,25 @@ let essais = 0;
 let timerStarted = false;
 let derniereVerification = "";
 
-let appareilID = localStorage.getItem("appareilID") || crypto.randomUUID();
-localStorage.setItem("appareilID", appareilID);
+// Fonction de secours si crypto.randomUUID n'est pas dispo (HTTP ou local)
+function genererIdentifiantSecours() {
+    return 'dev-' + Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
+}
+
+function obtenirAppareilID() {
+    let id = localStorage.getItem("appareilID");
+    if (!id) {
+        try {
+            id = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : genererIdentifiantSecours();
+        } catch (e) {
+            id = genererIdentifiantSecours();
+        }
+        localStorage.setItem("appareilID", id);
+    }
+    return id;
+}
+
+let appareilID = obtenirAppareilID();
 
 //////////////////////////////////////////////////
 // 🔐 CONNEXION
@@ -150,7 +167,6 @@ function deconnexion(){
     document.getElementById("timer").style.display="none";
     document.getElementById("code").value="";
 
-    // Correction ? ici
     const oldBtn1 = document.querySelector(".downloadBtn");
     if(oldBtn1){ oldBtn1.remove(); }
 
@@ -387,7 +403,6 @@ async function verifier(){
 
     ouvrirPdfProtege(p.expires_at);
 
-    // Correction ? ici
     const oldBtn2 = document.querySelector(".downloadBtn");
     if(oldBtn2){ oldBtn2.remove(); }
 
@@ -452,7 +467,6 @@ function startTimer(expireDate){
             document.getElementById("topcode").style.display="none";
             document.getElementById("code").value="";
             
-            // Correction ? ici
             const oldBtn3 = document.querySelector(".downloadBtn");
             if(oldBtn3){ oldBtn3.remove(); }
             

@@ -788,7 +788,8 @@ return;
 const a =
 document.createElement("a");
 
-a.href = "formation2026.pdf";?nocache="
+a.href =
+"formation2026.pdf?nocache="
 + Date.now();
 
 a.download =
@@ -796,13 +797,13 @@ a.download =
 
 a.click();
 
-};
+}; // ✅ fermeture de btn.onclick
 
 document.body.appendChild(btn);
 
 },1000);
 
-}
+} // ✅ fermeture de verifier()
 
 //////////////////////////////////////////////////
 // 🔒 PDF
@@ -822,8 +823,6 @@ return;
 window.open(
 "formation2026.pdf?nocache=" + Date.now(),
 "_blank"
-);
-
 );
 
 }
@@ -891,7 +890,6 @@ document.getElementById("timer")
 },1000);
 
 }
-
 </script>
 
 </body>

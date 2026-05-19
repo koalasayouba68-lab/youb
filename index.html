@@ -1,69 +1,18 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Accès PDF</title>
-    <meta name="google-site-verification" content="v1n-U1ZbQ_z94Hxt0NyvesUKsW1mK5yBPT3q6O8in4c" />
-    <style>
-        body{
-            font-family:Arial;
-            background:#f4f4f4;
-            padding:10px;
-            margin:0;
-        }
-        .box{
-            width:95%;
-            max-width:600px;
-            margin:20px auto;
-            background:white;
-            padding:20px;
-            border-radius:10px;
-            box-shadow:0 0 10px rgba(0,0,0,0.2);
-        }
-        button{
-            padding:10px;
-            width:100%;
-            margin-top:10px;
-            cursor:pointer;
-            border:none;
-            border-radius:8px;
-            font-size:16px;
-        }
-        input{
-            width:100%;
-            padding:10px;
-            margin-top:10px;
-            box-sizing:border-box;
-            border-radius:8px;
-            border:1px solid #ccc;
-            font-size:16px;
-        }
-        #topcode{
-            position:fixed;
-            top:10px;
-            right:10px;
-            background:black;
-            color:white;
-            padding:10px;
-            border-radius:10px;
-            display:none;
-            z-index:999;
-            font-size:14px;
-        }
-        #timer{
-            position:fixed;
-            top:60px;
-            right:10px;
-            background:red;
-            color:white;
-            padding:10px;
-            border-radius:10px;
-            display:none;
-            z-index:999;
-            font-size:14px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Accès PDF</title>
+<meta name="google-site-verification" content="v1n-U1ZbQ_z94Hxt0NyvesUKsW1mK5yBPT3q6O8in4c" />
+<style>
+body{font-family:Arial;background:#f4f4f4;padding:10px;margin:0;}
+.box{width:95%;max-width:600px;margin:20px auto;background:white;padding:20px;border-radius:10px;box-shadow:0 0 10px rgba(0,0,0,0.2);}
+button{padding:10px;width:100%;margin-top:10px;cursor:pointer;border:none;border-radius:8px;font-size:16px;}
+input{width:100%;padding:10px;margin-top:10px;box-sizing:border-box;border-radius:8px;border:1px solid #ccc;font-size:16px;}
+#topcode{position:fixed;top:10px;right:10px;background:black;color:white;padding:10px;border-radius:10px;display:none;z-index:999;font-size:14px;}
+#timer{position:fixed;top:60px;right:10px;background:red;color:white;padding:10px;border-radius:10px;display:none;z-index:999;font-size:14px;}
+</style>
 </head>
 <body>
 
@@ -72,41 +21,26 @@
 
 <!-- 🔐 LOGIN -->
 <div id="loginBox" class="box">
-    <h2>🔐 Connexion</h2>
-    <p>Entre ton numéro pour continuer.</p>
-    <input id="loginPhone" placeholder="Entrer votre numéro">
-    <button onclick="alert('Le HTML répond !'); connexion()">Continuer</button>
-    ```
-
-Ensuite, enregistre ton fichier, rafraîchis ta page et clique sur le bouton. 
-
-*   **Si la boîte d'alerte s'affiche :** Le HTML est bien à jour, mais une autre erreur bloque le script. Fais un **clic droit sur ta page > Inspecter > onglet "Console"** et regarde s'il n'y a pas un *autre* message d'erreur écrit en rouge **au-dessus** du `connexion is not defined`. S'il y en a un, donne-le-moi, c'est lui le vrai coupable.
-*   **Si rien ne s'affiche et que tu as direct l'erreur :** Ton navigateur est totalement bloqué sur ton ancien code. Passe à l'étape 2.
-
-### Étape 2 : Forcer le vidage du cache
-Les navigateurs adorent garder en mémoire les scripts pour aller plus vite.
-*   Sur ton navigateur, fais la combinaison de touches suivante pour forcer le rechargement total :
-    *   **Sur Windows (Chrome/Edge/Firefox) :** Appuie sur `Ctrl` + `F5` (ou `Ctrl` + `Shift` + `R`).
-    *   **Sur Mac :** Appuie sur `Cmd` + `Shift` + `R`.
-*   Si tu es sur ton téléphone, ferme l'onglet, va dans les paramètres de ton navigateur pour "Vider l'historique et les données de site", puis rouvre la page.
-
-### Étape 3 : Vérifie ton déploiement Vercel
-Si tu passes par Vercel, assure-toi d'avoir bien fait ton `git push` ou que le build s'est terminé avec succès sur ton tableau de bord Vercel. Si le build a échoué là-bas, Vercel continue d'afficher ton ancienne version buggée en ligne.
+<h2>🔐 Connexion</h2>
+<p>Entre ton numéro pour continuer.</p>
+<input id="loginPhone" placeholder="Entrer votre numéro">
+<button onclick="connexion()">Continuer</button>
+</div>
 
 <!-- 📘 SITE -->
 <div class="box" id="siteBox" style="display:none;">
-    <h2>📘 Accès PDF</h2>
-    <h3>💰 Paiement Orange Money</h3>
-    <p style="background:#fff3cd; padding:10px; border-radius:8px;">
-        📌 Composez : <b>*144*10*44295613*300#</b><br><br>
-        Puis revenez cliquer sur <b>✔ J’ai payé</b> pour recevoir votre code.
-    </p>
-    <button id="payBtn" onclick="payer()">✔ J’ai payé</button>
-    <hr>
-    <h3>🔑 Entrer code</h3>
-    <input id="code" placeholder="Code reçu">
-    <button onclick="verifier()">Accéder PDF</button>
-    <button onclick="deconnexion()" style="background:red; color:white;">Déconnexion</button>
+<h2>📘 Accès PDF</h2>
+<h3>💰 Paiement Orange Money</h3>
+<p style="background:#fff3cd; padding:10px; border-radius:8px;">
+📌 Composez : <b>*144*10*44295613*300#</b><br><br>
+Puis revenez cliquer sur <b>✔ J’ai payé</b> pour recevoir votre code.
+</p>
+<button id="payBtn" onclick="payer()">✔ J’ai payé</button>
+<hr>
+<h3>🔑 Entrer code</h3>
+<input id="code" placeholder="Code reçu">
+<button onclick="verifier()">Accéder PDF</button>
+<button onclick="deconnexion()" style="background:red; color:white;">Déconnexion</button>
 </div>
 
 <script>
@@ -117,7 +51,7 @@ const SUPABASE_URL = "https://gkqlmpkmzfvurkzgrjlm.supabase.co";
 const SUPABASE_KEY = "sb_publishable_TpKfbr8y19-DzT9dQvlr5Q_2MR-ciXr";
 
 //////////////////////////////////////////////////
-// 🔥 VARIABLES & ID APPAREIL SÉCURISÉ
+// 🔥 VARIABLES & SECURE ID
 //////////////////////////////////////////////////
 let countdown;
 let checkInterval;
@@ -125,377 +59,376 @@ let essais = 0;
 let timerStarted = false;
 let derniereVerification = "";
 
-// Fonction de secours si crypto.randomUUID n'est pas dispo (HTTP ou local)
 function genererIdentifiantSecours() {
-    return 'dev-' + Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
+return 'dev-' + Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
 }
 
 function obtenirAppareilID() {
-    let id = localStorage.getItem("appareilID");
-    if (!id) {
-        try {
-            id = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : genererIdentifiantSecours();
-        } catch (e) {
-            id = genererIdentifiantSecours();
-        }
-        localStorage.setItem("appareilID", id);
-    }
-    return id;
+let id = localStorage.getItem("appareilID");
+if (!id) {
+try {
+id = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : genererIdentifiantSecours();
+} catch (e) {
+id = genererIdentifiantSecours();
+}
+localStorage.setItem("appareilID", id);
+}
+return id;
 }
 
 let appareilID = obtenirAppareilID();
 
 //////////////////////////////////////////////////
-// 🔐 CONNEXION
+// 🔐 CONNEXION (Placée en haut pour être lue en priorité)
 //////////////////////////////////////////////////
 function connexion(){
-    const phone = document.getElementById("loginPhone").value.trim();
+const phone = document.getElementById("loginPhone").value.trim();
 
-    if(!phone){
-        alert("Entre ton numéro ❌");
-        return;
-    }
+if(!phone){
+alert("Entre ton numéro ❌");
+return;
+}
 
-    if(phone.length < 8){
-        alert("Numéro invalide ❌");
-        return;
-    }
+if(phone.length < 8){
+alert("Numéro invalide ❌");
+return;
+}
 
-    localStorage.setItem("phone", phone);
+localStorage.setItem("phone", phone);
 
-    document.getElementById("loginBox").style.display="none";
-    document.getElementById("siteBox").style.display="block";
+document.getElementById("loginBox").style.display="none";
+document.getElementById("siteBox").style.display="block";
 
-    restaurerCode();
-    surveillerConfirmation();
+restaurerCode();
+surveillerConfirmation();
 }
 
 //////////////////////////////////////////////////
 // 🔓 DECONNEXION
 //////////////////////////////////////////////////
 function deconnexion(){
-    localStorage.removeItem("phone");
+localStorage.removeItem("phone");
 
-    document.getElementById("loginBox").style.display="block";
-    document.getElementById("siteBox").style.display="none";
-    document.getElementById("topcode").style.display="none";
-    document.getElementById("timer").style.display="none";
-    document.getElementById("code").value="";
+document.getElementById("loginBox").style.display="block";
+document.getElementById("siteBox").style.display="none";
+document.getElementById("topcode").style.display="none";
+document.getElementById("timer").style.display="none";
+document.getElementById("code").value="";
 
-    const oldBtn1 = document.querySelector(".downloadBtn");
-    if(oldBtn1){ oldBtn1.remove(); }
+const oldBtn1 = document.querySelector(".downloadBtn");
+if(oldBtn1){ oldBtn1.remove(); }
 
-    clearInterval(checkInterval);
-    clearInterval(countdown);
-    timerStarted = false;
+clearInterval(checkInterval);
+clearInterval(countdown);
+timerStarted = false;
 }
 
 //////////////////////////////////////////////////
 // 🔄 RESTAURER SESSION
 //////////////////////////////////////////////////
 window.onload = function(){
-    const phone = localStorage.getItem("phone");
+const phone = localStorage.getItem("phone");
 
-    if(phone){
-        document.getElementById("loginBox").style.display="none";
-        document.getElementById("siteBox").style.display="block";
-        restaurerCode();
-        surveillerConfirmation();
-    }else{
-        document.getElementById("loginBox").style.display="block";
-        document.getElementById("siteBox").style.display="none";
-    }
+if(phone){
+document.getElementById("loginBox").style.display="none";
+document.getElementById("siteBox").style.display="block";
+restaurerCode();
+surveillerConfirmation();
+}else{
+document.getElementById("loginBox").style.display="block";
+document.getElementById("siteBox").style.display="none";
+}
 }
 
 //////////////////////////////////////////////////
 // 🔄 RESTAURER CODE
 //////////////////////////////////////////////////
 async function restaurerCode(){
-    const phone = localStorage.getItem("phone");
-    if(!phone) return;
+const phone = localStorage.getItem("phone");
+if(!phone) return;
 
-    const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/payments?phone=eq.${phone}&status=eq.confirmé&select=*`,
-        {
-            headers:{
-                apikey:SUPABASE_KEY,
-                Authorization: `Bearer ${SUPABASE_KEY}`
-            }
-        }
-    );
+const res = await fetch(
+`${SUPABASE_URL}/rest/v1/payments?phone=eq.${phone}&status=eq.confirmé&select=*`,
+{
+headers:{
+apikey:SUPABASE_KEY,
+Authorization: `Bearer ${SUPABASE_KEY}`
+}
+}
+);
 
-    const data = await res.json();
-    if(!data || data.length===0) return;
+const data = await res.json();
+if(!data || data.length===0) return;
 
-    const p = data[data.length - 1];
+const p = data[data.length - 1];
 
-    if(new Date(p.expires_at) > new Date()){
-        document.getElementById("topcode").style.display="block";
-        document.getElementById("topcode").innerHTML = "🔑 Code actif : " + p.code;
-        document.getElementById("code").value = p.code;
+if(new Date(p.expires_at) > new Date()){
+document.getElementById("topcode").style.display="block";
+document.getElementById("topcode").innerHTML = "🔑 Code actif : " + p.code;
+document.getElementById("code").value = p.code;
 
-        if(!timerStarted){
-            startTimer(p.expires_at);
-            timerStarted = true;
-        }
-    }
+if(!timerStarted){
+startTimer(p.expires_at);
+timerStarted = true;
+}
+}
 }
 
 //////////////////////////////////////////////////
 // 💰 PAYER
 //////////////////////////////////////////////////
 async function payer(){
-    const phone = localStorage.getItem("phone");
+const phone = localStorage.getItem("phone");
 
-    if(!phone){
-        alert("Reconnecte-toi ❌");
-        return;
-    }
+if(!phone){
+alert("Reconnecte-toi ❌");
+return;
+}
 
-    document.getElementById("payBtn").disabled = true;
+document.getElementById("payBtn").disabled = true;
 
-    const check = await fetch(
-        `${SUPABASE_URL}/rest/v1/payments?phone=eq.${phone}&status=eq.en attente`,
-        {
-            headers:{
-                apikey:SUPABASE_KEY,
-                Authorization: `Bearer ${SUPABASE_KEY}`
-            }
-        }
-    );
+const check = await fetch(
+`${SUPABASE_URL}/rest/v1/payments?phone=eq.${phone}&status=eq.en attente`,
+{
+headers:{
+apikey:SUPABASE_KEY,
+Authorization: `Bearer ${SUPABASE_KEY}`
+}
+}
+);
 
-    const oldData = await check.json();
+const oldData = await check.json();
 
-    if(oldData.length > 0){
-        alert("Paiement déjà envoyé ⏳");
-        document.getElementById("payBtn").disabled = false;
-        return;
-    }
+if(oldData.length > 0){
+alert("Paiement déjà envoyé ⏳");
+document.getElementById("payBtn").disabled = false;
+return;
+}
 
-    await fetch(
-        `${SUPABASE_URL}/rest/v1/payments`,
-        {
-            method:"POST",
-            headers:{
-                apikey:SUPABASE_KEY,
-                Authorization: `Bearer ${SUPABASE_KEY}`,
-                "Content-Type":"application/json"
-            },
-            body:JSON.stringify({
-                phone:phone,
-                status:"en attente",
-                created_at: new Date().toISOString()
-            })
-        }
-    );
+await fetch(
+`${SUPABASE_URL}/rest/v1/payments`,
+{
+method:"POST",
+headers:{
+apikey:SUPABASE_KEY,
+Authorization: `Bearer ${SUPABASE_KEY}`,
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+phone:phone,
+status:"en attente",
+created_at: new Date().toISOString()
+})
+}
+);
 
-    alert("Paiement envoyé ✔");
-    document.getElementById("payBtn").disabled = false;
+alert("Paiement envoyé ✔");
+document.getElementById("payBtn").disabled = false;
 }
 
 //////////////////////////////////////////////////
 // 🔄 SURVEILLER CONFIRMATION
 //////////////////////////////////////////////////
 function surveillerConfirmation(){
-    clearInterval(checkInterval);
+clearInterval(checkInterval);
 
-    checkInterval = setInterval(async ()=>{
-        const phone = localStorage.getItem("phone");
-        if(!phone) return;
+checkInterval = setInterval(async ()=>{
+const phone = localStorage.getItem("phone");
+if(!phone) return;
 
-        const res = await fetch(
-            `${SUPABASE_URL}/rest/v1/payments?phone=eq.${phone}&status=eq.confirmé&select=*`,
-            {
-                headers:{
-                    apikey:SUPABASE_KEY,
-                    Authorization: `Bearer ${SUPABASE_KEY}`
-                }
-            }
-        );
+const res = await fetch(
+`${SUPABASE_URL}/rest/v1/payments?phone=eq.${phone}&status=eq.confirmé&select=*`,
+{
+headers:{
+apikey:SUPABASE_KEY,
+Authorization: `Bearer ${SUPABASE_KEY}`
+}
+}
+);
 
-        const data = await res.json();
-        if(!data || data.length===0) return;
+const data = await res.json();
+if(!data || data.length===0) return;
 
-        const p = data[data.length - 1];
+const p = data[data.length - 1];
 
-        if(new Date(p.expires_at) < new Date()){
-            document.getElementById("topcode").style.display="none";
-            document.getElementById("code").value="";
-            return;
-        }
+if(new Date(p.expires_at) < new Date()){
+document.getElementById("topcode").style.display="none";
+document.getElementById("code").value="";
+return;
+}
 
-        if(p.device_id && p.device_id !== appareilID){
-            alert("Compte utilisé sur un autre appareil ❌");
-            deconnexion();
-            return;
-        }
+if(p.device_id && p.device_id !== appareilID){
+alert("Compte utilisé sur un autre appareil ❌");
+deconnexion();
+return;
+}
 
-        if(derniereVerification === p.code) return;
-        derniereVerification = p.code;
+if(derniereVerification === p.code) return;
+derniereVerification = p.code;
 
-        document.getElementById("topcode").style.display="block";
-        document.getElementById("topcode").innerHTML = "🔑 Code actif : " + p.code;
-        document.getElementById("code").value = p.code;
+document.getElementById("topcode").style.display="block";
+document.getElementById("topcode").innerHTML = "🔑 Code actif : " + p.code;
+document.getElementById("code").value = p.code;
 
-        if(!timerStarted){
-            startTimer(p.expires_at);
-            timerStarted = true;
-        }
+if(!timerStarted){
+startTimer(p.expires_at);
+timerStarted = true;
+}
 
-    },10000);
+},10000);
 }
 
 //////////////////////////////////////////////////
 // 🔑 VERIFIER
 //////////////////////////////////////////////////
 async function verifier(){
-    if(essais >= 5){
-        alert("Trop de tentatives ❌");
-        return;
-    }
+if(essais >= 5){
+alert("Trop de tentatives ❌");
+return;
+}
 
-    const code = document.getElementById("code").value.trim();
-    const phone = localStorage.getItem("phone");
+const code = document.getElementById("code").value.trim();
+const phone = localStorage.getItem("phone");
 
-    if(!phone){
-        alert("Reconnecte-toi ❌");
-        return;
-    }
+if(!phone){
+alert("Reconnecte-toi ❌");
+return;
+}
 
-    const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/payments?phone=eq.${phone}&code=eq.${code}&status=eq.confirmé`,
-        {
-            headers:{
-                apikey:SUPABASE_KEY,
-                Authorization: `Bearer ${SUPABASE_KEY}`
-            }
-        }
-    );
+const res = await fetch(
+`${SUPABASE_URL}/rest/v1/payments?phone=eq.${phone}&code=eq.${code}&status=eq.confirmé`,
+{
+headers:{
+apikey:SUPABASE_KEY,
+Authorization: `Bearer ${SUPABASE_KEY}`
+}
+}
+);
 
-    const data = await res.json();
+const data = await res.json();
 
-    if(!data || data.length===0){
-        essais++;
-        alert("Code invalide ❌");
-        return;
-    }
+if(!data || data.length===0){
+essais++;
+alert("Code invalide ❌");
+return;
+}
 
-    const p = data[0];
+const p = data[0];
 
-    if(p.device_id && p.device_id !== appareilID){
-        alert("Compte déjà utilisé ailleurs ❌");
-        return;
-    }
+if(p.device_id && p.device_id !== appareilID){
+alert("Compte déjà utilisé ailleurs ❌");
+return;
+}
 
-    if(new Date(p.expires_at) < new Date()){
-        alert("Code expiré ❌");
-        document.getElementById("code").value="";
-        return;
-    }
+if(new Date(p.expires_at) < new Date()){
+alert("Code expiré ❌");
+document.getElementById("code").value="";
+return;
+}
 
-    essais = 0;
+essais = 0;
 
-    await fetch(
-        `${SUPABASE_URL}/rest/v1/payments?id=eq.${p.id}`,
-        {
-            method:"PATCH",
-            headers:{
-                apikey:SUPABASE_KEY,
-                Authorization: `Bearer ${SUPABASE_KEY}`,
-                "Content-Type":"application/json"
-            },
-            body:JSON.stringify({
-                device_id:appareilID
-            })
-        }
-    );
+await fetch(
+`${SUPABASE_URL}/rest/v1/payments?id=eq.${p.id}`,
+{
+method:"PATCH",
+headers:{
+apikey:SUPABASE_KEY,
+Authorization: `Bearer ${SUPABASE_KEY}`,
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+device_id:appareilID
+})
+}
+);
 
-    startTimer(p.expires_at);
-    alert("Accès autorisé ✔");
+startTimer(p.expires_at);
+alert("Accès autorisé ✔");
 
-    document.getElementById("topcode").style.display="block";
-    document.getElementById("topcode").innerHTML = "🔑 Code actif : " + p.code;
+document.getElementById("topcode").style.display="block";
+document.getElementById("topcode").innerHTML = "🔑 Code actif : " + p.code;
 
-    ouvrirPdfProtege(p.expires_at);
+ouvrirPdfProtege(p.expires_at);
 
-    const oldBtn2 = document.querySelector(".downloadBtn");
-    if(oldBtn2){ oldBtn2.remove(); }
+const oldBtn2 = document.querySelector(".downloadBtn");
+if(oldBtn2){ oldBtn2.remove(); }
 
-    setTimeout(()=>{
-        const btn = document.createElement("button");
-        btn.className = "downloadBtn";
-        btn.innerText = "⬇ Télécharger PDF";
+setTimeout(()=>{
+const btn = document.createElement("button");
+btn.className = "downloadBtn";
+btn.innerText = "⬇ Télécharger PDF";
 
-        btn.style.position="fixed";
-        btn.style.bottom="20px";
-        btn.style.left="50%";
-        btn.style.transform= "translateX(-50%)";
-        btn.style.padding="15px";
-        btn.style.background="green";
-        btn.style.color="white";
-        btn.style.border="none";
-        btn.style.borderRadius="10px";
-        btn.style.zIndex="9999";
+btn.style.position="fixed";
+btn.style.bottom="20px";
+btn.style.left="50%";
+btn.style.transform= "translateX(-50%)";
+btn.style.padding="15px";
+btn.style.background="green";
+btn.style.color="white";
+btn.style.border="none";
+btn.style.borderRadius="10px";
+btn.style.zIndex="9999";
 
-        btn.onclick = ()=>{
-            if(new Date(p.expires_at) < new Date()){
-                alert("Code expiré ❌");
-                btn.remove();
-                return;
-            }
+btn.onclick = ()=>{
+if(new Date(p.expires_at) < new Date()){
+alert("Code expiré ❌");
+btn.remove();
+return;
+}
 
-            const a = document.createElement("a");
-            a.href = "formation2026.pdf?nocache=" + Date.now();
-            a.download = "formation2026.pdf";
-            a.click();
-        }; 
+const a = document.createElement("a");
+a.href = "formation2026.pdf?nocache=" + Date.now();
+a.download = "formation2026.pdf";
+a.click();
+}; 
 
-        document.body.appendChild(btn);
-    },1000);
+document.body.appendChild(btn);
+},1000);
 } 
 
 //////////////////////////////////////////////////
 // 🔒 PDF
 //////////////////////////////////////////////////
 function ouvrirPdfProtege(expireDate){
-    if(new Date(expireDate) < new Date()){
-        alert("Code expiré ❌");
-        return;
-    }
-    window.open("formation2026.pdf?nocache=" + Date.now(), "_blank");
+if(new Date(expireDate) < new Date()){
+alert("Code expiré ❌");
+return;
+}
+window.open("formation2026.pdf?nocache=" + Date.now(), "_blank");
 }
 
 //////////////////////////////////////////////////
 // ⏳ TIMER
 //////////////////////////////////////////////////
 function startTimer(expireDate){
-    clearInterval(countdown);
-    const exp = new Date(expireDate);
+clearInterval(countdown);
+const exp = new Date(expireDate);
 
-    document.getElementById("timer").style.display="block";
+document.getElementById("timer").style.display="block";
 
-    countdown = setInterval(()=>{
-        const diff = exp - new Date();
+countdown = setInterval(()=>{
+const diff = exp - new Date();
 
-        if(diff <= 0){
-            document.getElementById("timer").innerHTML = "❌ Code expiré";
-            document.getElementById("topcode").style.display="none";
-            document.getElementById("code").value="";
-            
-            const oldBtn3 = document.querySelector(".downloadBtn");
-            if(oldBtn3){ oldBtn3.remove(); }
-             
-            timerStarted = false;
-            clearInterval(countdown);
-            return;
-        }
+if(diff <= 0){
+document.getElementById("timer").innerHTML = "❌ Code expiré";
+document.getElementById("topcode").style.display="none";
+document.getElementById("code").value="";
 
-        const h = Math.floor(diff/3600000);
-        const m = Math.floor((diff%3600000)/60000);
-        const s = Math.floor((diff%60000)/1000);
+const oldBtn3 = document.querySelector(".downloadBtn");
+if(oldBtn3){ oldBtn3.remove(); }
 
-        document.getElementById("timer").innerHTML = "⏳ Expire dans " + h + "h " + m + "m " + s + "s";
-    },1000);
+timerStarted = false;
+clearInterval(countdown);
+return;
+}
+
+const h = Math.floor(diff/3600000);
+const m = Math.floor((diff%3600000)/60000);
+const s = Math.floor((diff%60000)/1000);
+
+document.getElementById("timer").innerHTML = "⏳ Expire dans " + h + "h " + m + "m " + s + "s";
+},1000);
 }
 </script>
 

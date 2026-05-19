@@ -75,8 +75,23 @@
     <h2>🔐 Connexion</h2>
     <p>Entre ton numéro pour continuer.</p>
     <input id="loginPhone" placeholder="Entrer votre numéro">
-    <button onclick="connexion()">Continuer</button>
-</div>
+    <button onclick="alert('Le HTML répond !'); connexion()">Continuer</button>
+    ```
+
+Ensuite, enregistre ton fichier, rafraîchis ta page et clique sur le bouton. 
+
+*   **Si la boîte d'alerte s'affiche :** Le HTML est bien à jour, mais une autre erreur bloque le script. Fais un **clic droit sur ta page > Inspecter > onglet "Console"** et regarde s'il n'y a pas un *autre* message d'erreur écrit en rouge **au-dessus** du `connexion is not defined`. S'il y en a un, donne-le-moi, c'est lui le vrai coupable.
+*   **Si rien ne s'affiche et que tu as direct l'erreur :** Ton navigateur est totalement bloqué sur ton ancien code. Passe à l'étape 2.
+
+### Étape 2 : Forcer le vidage du cache
+Les navigateurs adorent garder en mémoire les scripts pour aller plus vite.
+*   Sur ton navigateur, fais la combinaison de touches suivante pour forcer le rechargement total :
+    *   **Sur Windows (Chrome/Edge/Firefox) :** Appuie sur `Ctrl` + `F5` (ou `Ctrl` + `Shift` + `R`).
+    *   **Sur Mac :** Appuie sur `Cmd` + `Shift` + `R`.
+*   Si tu es sur ton téléphone, ferme l'onglet, va dans les paramètres de ton navigateur pour "Vider l'historique et les données de site", puis rouvre la page.
+
+### Étape 3 : Vérifie ton déploiement Vercel
+Si tu passes par Vercel, assure-toi d'avoir bien fait ton `git push` ou que le build s'est terminé avec succès sur ton tableau de bord Vercel. Si le build a échoué là-bas, Vercel continue d'afficher ton ancienne version buggée en ligne.
 
 <!-- 📘 SITE -->
 <div class="box" id="siteBox" style="display:none;">
@@ -469,7 +484,7 @@ function startTimer(expireDate){
             
             const oldBtn3 = document.querySelector(".downloadBtn");
             if(oldBtn3){ oldBtn3.remove(); }
-            
+             
             timerStarted = false;
             clearInterval(countdown);
             return;

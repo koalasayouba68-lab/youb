@@ -5,8 +5,19 @@
 <title>Admin Dashboard</title>
 
 <style>
-body{font-family:Arial;background:#f4f4f4;padding:20px;}
+/* 🔒 Sécurité : Caché par défaut tant que le bon mot de passe n'est pas saisi */
+body{font-family:Arial;background:#f4f4f4;padding:20px;display:none;}
 .box{max-width:900px;margin:auto;background:white;padding:20px;border-radius:10px;}
+
+.actions-bar {
+display: flex;
+gap: 10px;
+margin-bottom: 15px;
+align-items: center;
+background: #f9f9f9;
+padding: 10px;
+border-radius: 8px;
+}
 
 .item{
 background:#eee;
@@ -18,9 +29,23 @@ justify-content:space-between;
 align-items:center;
 }
 
-button{padding:8px;margin:5px;cursor:pointer;}
-.ok{background:green;color:white;border:none;}
-.ok:disabled{background:gray;cursor:not-allowed;}
+.item-left {
+display: flex;
+align-items: center;
+gap: 15px;
+}
+
+.checkbox-pay {
+width: 20px;
+height: 20px;
+cursor: pointer;
+}
+
+button{padding:8px;margin:5px;cursor:pointer;border-radius:5px;}
+.btn-primary {background:#2196F3; color:white; border:none;}
+.btn-success {background:green; color:white; border:none;}
+.btn-success:disabled{background:gray;cursor:not-allowed;}
+.btn-batch {background:#9c27b0; color:white; border:none; display:none; font-weight:bold;}
 
 .timer{
 font-weight:bold;
@@ -33,18 +58,35 @@ margin-top:5px;
 <body>
 
 <div class="box">
-<h2>🟣 Admin Dashboard</h2>
-<button onclick="load()">🔄 Charger paiements</button>
+<h2>🟣 Admin Dashboard - KOALA</h2>
+
+<!-- 🛠 BARRE D'ACTIONS -->
+<div class="actions-bar">
+<button class="btn-primary" onclick="load()">🔄 Charger paiements</button>
+<button class="btn-primary" onclick="cocherTout()">🔲 Sélectionner tout (en attente)</button>
+<button id="batchConfirmBtn" class="btn-batch" onclick="confirmerSelection()">✔ Confirmer la sélection</button>
+</div>
+
 <div id="list"></div>
 </div>
 
 <script>
+// 🔒 SYSTÈME DE VÉRIFICATION DU MOT DE PASSE SECRET
+const codeAdmin = prompt("Entrez le code d'accès Admin :");
+
+if (codeAdmin !== "2005koala") {
+    alert("Mot de passe incorrect !");
+    window.location.href = "about:blank"; // Redirection vers une page blanche
+} else {
+    document.body.style.display = "block"; // Affiche l'application si le code est valide
+}
 
 const SUPABASE_URL = "https://gkqlmpkmzfvurkzgrjlm.supabase.co";
 const SUPABASE_KEY = "sb_publishable_TpKfbr8y19-DzT9dQvlr5Q_2MR-ciXr";
 
 // 🔄 LOAD
 async function load(){
+document.getElementById("batchConfirmBtn").style.display = "none";
 
 const res = await fetch(`${SUPABASE_URL}/rest/v1/payments?select=*`,{
 headers:{
@@ -53,51 +95,73 @@ Authorization:`Bearer ${SUPABASE_KEY}`
 }
 });
 
-const data = await res.json();
+let data = await res.json();
 
 console.log("DATA:", data);
 
+// ⚡ 1. TRI AUTOMATIQUE : "En attente" en haut, puis tri par date du plus récent au plus ancien
+data.sort((a, b) => {
+if (a.status === "en attente" && b.status !== "en attente") return -1;
+if (a.status !== "en attente" && b.status === "en attente") return 1;
+return new Date(b.created_at || b.id) - new Date(a.created_at || a.id);
+});
+
 let html = "";
+const maintenant = new Date();
 
 data.forEach(p=>{
-
 const isConfirmed = p.status === "confirmé";
 
-// ⏳ CALCUL TIMER
+// ⏳ 2. FILTRE DE NETTOYAGE : Supprime l'affichage des vieux codes de formations après 72h (Laisse toujours visibles les espaces loués)
+if (isConfirmed && p.expires_at) {
+const dateExpiration = new Date(p.expires_at);
+const dateConfirmation = new Date(dateExpiration.getTime() - (2 * 60 * 60 * 1000));
+const tempsEcouleDepuisConfirmation = maintenant - dateConfirmation;
+const limite72h = 72 * 60 * 60 * 1000;
+
+if (tempsEcouleDepuisConfirmation > limite72h) {
+return; 
+}
+}
+
+// ⏳ CALCUL DU TEMPS RESTANT OU TYPE D'ACCÈS
 let timerText = "";
+let typeAchat = "📚 Formation";
 
-if(p.expires_at){
-
-const now = new Date();
+// Détection intelligente du type de produit basé sur le montant (ou sur l'absence de date limite d'expiration)
+if (p.expires_at) {
 const exp = new Date(p.expires_at);
-const diff = exp - now;
+const diff = exp - maintenant;
 
 if(diff > 0){
-
-const m = Math.floor(diff / 60000);
-const s = Math.floor((diff % 60000) / 1000);
-
-timerText = `⏳ ${m}m ${s}s restant`;
-
+const h = Math.floor(diff / 3600000);
+const m = Math.floor((diff % 3600000) / 60000);
+timerText = `⏳ ${h}h ${m}m restant`;
 }else{
 timerText = "❌ expiré";
 }
-
-}else{
-timerText = "—";
+} else if (isConfirmed && !p.expires_at) {
+typeAchat = "🔒 Permanent (Espace Vente)";
+timerText = "✅ Accès illimité (Loueur)";
+} else {
+timerText = "En attente de traitement...";
 }
 
 html += `
-<div class="item">
+<div class="item" style="${!p.expires_at && isConfirmed ? 'border-left: 5px solid #2196F3;' : ''}">
+<div class="item-left">
+${!isConfirmed ? `<input type="checkbox" class="checkbox-pay" value="${p.id}" onchange="gererVisibiliteBoutonGroupe()">` : `<span style="width:20px;"></span>`}
 <div>
-📞 ${p.phone}<br>
-Status: ${isConfirmed ? "✔ confirmé" : "⏳ en attente"}<br>
-Code: ${p.code ? p.code : "—"}<br>
-<div class="timer">${timerText}</div>
+📞 <b>${p.phone}</b><br>
+Type : <span style="color:${p.expires_at ? 'green' : '#2196F3'}; font-weight:bold;">${p.expires_at || !isConfirmed ? typeAchat : '🔒 Permanent (Espace Vente)'}</span><br>
+Status: ${isConfirmed ? "<span style='color:green;'>✔ confirmé</span>" : "<span style='color:orange;'>⏳ en attente</span>"}<br>
+Code: ${p.code ? `<b style="background:#fff3cd; padding:2px 5px; border-radius:4px;">${p.code}</b>` : "—"}<br>
+<div class="timer" style="color:${p.expires_at ? '#d10000' : 'green'};">${timerText}</div>
+</div>
 </div>
 
 <div>
-<button class="ok"
+<button class="btn-success"
 onclick="confirmPay('${p.id}')"
 ${isConfirmed ? "disabled" : ""}>
 ✔ Confirmer
@@ -105,15 +169,100 @@ ${isConfirmed ? "disabled" : ""}>
 </div>
 </div>
 `;
-
 });
 
 document.getElementById("list").innerHTML = html;
 }
 
-// ✔ CONFIRMER
-async function confirmPay(id){
+// 🔲 COCHER UNIQUEMENT CEUX EN ATTENTE
+function cocherTout(){
+const checkboxes = document.querySelectorAll(".checkbox-pay");
+checkboxes.forEach(cb => {
+cb.checked = true;
+});
 
+gererVisibiliteBoutonGroupe();
+}
+
+// 👀 AFFICHER/MASQUER LE BOUTON DE CONFIRMATION GROUPÉE
+function gererVisibiliteBoutonGroupe() {
+const checkboxes = document.querySelectorAll(".checkbox-pay");
+let auMoinsUnCoche = false;
+
+checkboxes.forEach(cb => {
+if(cb.checked) auMoinsUnCoche = true;
+});
+
+const batchBtn = document.getElementById("batchConfirmBtn");
+if(auMoinsUnCoche) {
+batchBtn.style.display = "inline-block";
+} else {
+batchBtn.style.display = "none";
+}
+}
+
+// ⚡ CONFIRMER PLUSIEURS PAIEMENTS SÉLECTIONNÉS D'UN COUP
+async function confirmerSelection() {
+const checkboxes = document.querySelectorAll(".checkbox-pay:checked");
+if(checkboxes.length === 0) return;
+
+if(!confirm(`Voulez-vous confirmer ces ${checkboxes.length} paiements d'un coup ?`)) return;
+
+document.getElementById("batchConfirmBtn").disabled = true;
+document.getElementById("batchConfirmBtn").innerText = "⏳ Traitement...";
+
+for(let cb of checkboxes) {
+const id = cb.value;
+await executerConfirmation(id);
+}
+
+alert("Tous les paiements sélectionnés ont été confirmés ! 🎉");
+load();
+}
+
+// 🔧 LOGIQUE TECHNIQUE DE CONFIRMATION AVEC GESTION INTELLIGENTE DU PRIX
+async function executerConfirmation(id) {
+const code = Math.random().toString(36).substring(2,8).toUpperCase();
+
+// 1. Récupérer d'abord les détails de la ligne pour vérifier si c'est une location à 1000 Fr
+const resCheck = await fetch(`${SUPABASE_URL}/rest/v1/payments?id=eq.${id}`, {
+headers:{ apikey:SUPABASE_KEY, Authorization:`Bearer ${SUPABASE_KEY}` }
+});
+const clientData = await resCheck.json();
+
+let updateBody = {
+status: "confirmé",
+code: code
+};
+
+if (clientData && clientData.length > 0) {
+const client = clientData[0];
+// Si le montant n'est pas trouvé ou s'il est différent de 1000, on applique les 2 heures par défaut.
+// Si c'est égal à 1000 (Espace libre), on n'ajoute PAS de "expires_at", ce qui le rend permanent.
+if (client.amount !== 1000 && client.amount !== "1000") {
+const expires = new Date(Date.now() + 2*60*60*1000); 
+updateBody.expires_at = expires.toISOString();
+}
+} else {
+// Sécurité : si problème de lecture, on applique la règle des 2h par défaut
+const expires = new Date(Date.now() + 2*60*60*1000); 
+updateBody.expires_at = expires.toISOString();
+}
+
+// 2. Mise à jour de la ligne sur Supabase
+await fetch(`${SUPABASE_URL}/rest/v1/payments?id=eq.${id}`,{
+method:"PATCH",
+headers:{
+apikey:SUPABASE_KEY,
+Authorization:`Bearer ${SUPABASE_KEY}`,
+"Content-Type":"application/json"
+},
+body:JSON.stringify(updateBody)
+});
+}
+
+// ✔ CONFIRMER UN SEUL PAIEMENT
+async function confirmPay(id){
 const check = await fetch(`${SUPABASE_URL}/rest/v1/payments?id=eq.${id}`,{
 headers:{
 apikey:SUPABASE_KEY,
@@ -133,34 +282,15 @@ alert("Déjà confirmé ✔");
 return;
 }
 
-// CODE + EXPIRATION
-const code = Math.random().toString(36).substring(2,8).toUpperCase();
-const expires = new Date(Date.now() + 2*60*60*1000);
-
-// UPDATE Supabase
-const res = await fetch(`${SUPABASE_URL}/rest/v1/payments?id=eq.${id}`,{
-method:"PATCH",
-headers:{
-apikey:SUPABASE_KEY,
-Authorization:`Bearer ${SUPABASE_KEY}`,
-"Content-Type":"application/json"
-},
-body:JSON.stringify({
-status:"confirmé",
-code:code,
-expires_at:expires.toISOString()
-})
-});
-
-console.log(await res.text());
-
-alert("Code généré : " + code);
-
+await executerConfirmation(id);
+alert("Paiement confirmé avec succès !");
 load();
 }
 
+// Chargement initial uniquement si le code d'authentification a réussi
+if (codeAdmin === "2005koala") {
 load();
-
+}
 </script>
 
 </body>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KOALA - Formations & Espaces</title>
+<title>KOALA - Plateforme Officielle</title>
 <meta name="google-site-verification" content="v1n-U1ZbQ_z94Hxt0NyvesUKsW1mK5yBPT3q6O8in4c" />
 <style>
 body{font-family:Arial, sans-serif;background:#f4f4f4;padding:10px;margin:0;}
@@ -32,12 +32,15 @@ margin-top: 15px;
 
 button{padding:10px;width:100%;margin-top:10px;cursor:pointer;border:none;border-radius:8px;font-size:16px;}
 button:hover{opacity:0.9;}
-input{width:100%;padding:10px;margin-top:10px;box-sizing:border-box;border-radius:8px;border:1px solid #ccc;font-size:16px;}
+input, textarea{width:100%;padding:10px;margin-top:10px;box-sizing:border-box;border-radius:8px;border:1px solid #ccc;font-size:16px;}
 #topcode{position:fixed;top:10px;right:10px;background:black;color:white;padding:10px;border-radius:10px;display:none;z-index:999;font-size:14px;}
 #timer{position:fixed;top:60px;right:10px;background:red;color:white;padding:10px;border-radius:10px;display:none;z-index:999;font-size:14px;}
 
-/* Zone de téléversement pour les locataires */
+/* Zone de configuration pour les locataires */
 #uploadZone { background: #e3f2fd; border: 2px dashed #2196F3; padding: 15px; border-radius: 8px; margin-top: 15px; display: none; }
+.form-group { margin-bottom: 15px; }
+.form-group label { font-weight: bold; color: #1565c0; font-size: 14px; }
+.action-buttons { display: flex; gap: 10px; margin-top: 15px; }
 </style>
 </head>
 <body>
@@ -59,8 +62,8 @@ input{width:100%;padding:10px;margin-top:10px;box-sizing:border-box;border-radiu
 <p style="line-height: 1.6; text-align: justify;">
 Bienvenue dans l'univers KOALA, votre plateforme tout-en-un de partage et d'apprentissage en ligne !<br><br>
 Ici, nous vous proposons deux opportunités uniques :<br><br>
-<b>• Des Espaces de Vente à Louer :</b> Vous êtes créateur ? Louez votre propre espace sécurisé pour seulement 1000 Fr CFA par mois ! Vous pourrez y importer et vendre votre propre fichier PDF ou votre vidéo (taille maximale de 5 Mo) en toute simplicité. Vos clients pourront y accéder et les télécharger en un clic.<br><br>
-<b>• Des Formations en Ligne Accessibles :</b> Découvrez un catalogue complet de formations de haute qualité à des coûts extrêmement réduits et adaptés à vos besoins. Apprenez à votre rythme, payez uniquement ce dont vous avez besoin, et débloquez votre contenu instantanément après validation.<br><br>
+<b>• Des Espaces de Vente à Louer :</b> Vous êtes créateur ? Louez votre propre espace sécurisé pour seulement 1000 Fr CFA par mois ! Vous pourrez y importer et vendre votre propre fichier PDF ou votre vidéo (taille maximale de 10 Mo) en toute simplicité. Vos clients pourront y accéder et les télécharger en un clic.<br><br>
+<b>• Des Formations en Ligne Accessibles :</b> Découvrez notre catalogue de formation de haute qualité à un coût extrêmement réduit et adapté à vos besoins. Apprenez à votre rythme, payez uniquement ce dont vous avez besoin, et débloquez votre contenu instantanément après validation.<br><br>
 <i>Cliquez sur le bouton ci-dessous pour découvrir nos formations disponibles et louer votre espace de vente dès maintenant !</i>
 </p>
 <button onclick="ouvrirCatalogue()" style="background: red; color: white; font-weight: bold; font-size: 18px; margin-top: 15px;">Découvrir le catalogue ➔</button>
@@ -69,26 +72,16 @@ Ici, nous vous proposons deux opportunités uniques :<br><br>
 <!-- 🟩 ÉCRAN 2 : CATALOGUE PRINCIPAL -->
 <div id="catalogBox" class="box" style="display:none; max-width: 850px;">
 <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px;">
-<h3 style="margin: 0; color: green;">👈 Cliquez sur une formation</h3>
+<h3 style="margin: 0; color: green;">👈 Cliquez sur la formation</h3>
 <h3 style="margin: 0; color: #2196F3; text-align: right;">Ou louez un espace libre 👉</h3>
 </div>
 
 <div class="grid-container">
-<!-- Colonne de gauche : Formations -->
+<!-- Colonne de gauche : Uniquement TA seule Formation Officielle -->
 <div class="column-left">
 <div class="formation-card">
 <button class="btn-formation" onclick="selectionnerAchat('Formation Principale KOALA', 300)">01. Acheter la Formation</button>
 <p style="font-size:13px; margin: 5px 0 0 0; color: #333;"><b>Description :</b> Notre formation de base exclusive pour maîtriser les outils numériques et booster vos compétences rapidement.<br><b>Prix : 300 Fr CFA</b></p>
-</div>
-
-<div class="formation-card">
-<button class="btn-formation" onclick="selectionnerAchat('Formation Pack Avancé', 1500)">02. Acheter la Formation</button>
-<p style="font-size:13px; margin: 5px 0 0 0; color: #333;"><b>Description :</b> Stratégies avancées de monétisation, gestion de projets digitaux et développement d'audience.<br><b>Prix : 1500 Fr CFA</b></p>
-</div>
-
-<div class="formation-card">
-<button class="btn-formation" onclick="selectionnerAchat('Formation Mobile & Cloud', 2000)">03. Acheter la Formation</button>
-<p style="font-size:13px; margin: 5px 0 0 0; color: #333;"><b>Description :</b> Guide complet pour configurer vos architectures de stockage cloud et applications mobiles avec Supabase.<br><b>Prix : 2000 Fr CFA</b></p>
 </div>
 </div>
 
@@ -116,12 +109,40 @@ Puis revenez cliquer sur <b>✔ J’ai payé</b> pour que l'administrateur gén�
 <input id="code" placeholder="Entrez le code d'accès">
 <button onclick="verifier()" style="background:#9c27b0; color:white; font-weight:bold;">Vérifier et Accéder</button>
 
-<!-- 📤 ESPACE DE TELEVERSEMENT LOCATAIRE (Affiche si code permanent valide) -->
+<!-- 👁️ ZONE DES BOUTONS DE LECTURE/TÉLÉCHARGEMENT FORMATION (Caché par défaut) -->
+<div id="formationAccessZone" style="display:none; margin-top: 20px; border-top: 2px solid #green; padding-top: 15px;">
+<h3 style="color: green; margin: 0 0 10px 0;">📚 Votre Formation est débloquée :</h3>
+<div class="action-buttons">
+<button onclick="ouvrirPDF()" style="background: #ff5722; color: white; font-weight: bold;">👁️ Voir le PDF</button>
+<button onclick="telechargerPDF()" style="background: green; color: white; font-weight: bold;">⬇️ Télécharger le PDF</button>
+</div>
+</div>
+
+<!-- 📤 NOUVELLE INTERFACE COMPLÈTE DU LOCATAIRE (Affiche si espace loué et validé) -->
 <div id="uploadZone">
-<h4 style="margin:0 0 10px 0; color:#1565c0;">📤 Espace Locataire : Importer votre fichier</h4>
-<p style="font-size:12px; color:#555; margin:0 0 10px 0;">Formats acceptés : PDF ou Vidéo (Taille maximum : 5 Mo)</p>
-<input type="file" id="fileInput" accept="application/pdf, video/*">
-<button onclick="importerFichier()" style="background:#1565c0; color:white; margin-top:10px;">🚀 Téléverser le fichier</button>
+<h3 style="margin:0 0 15px 0; color:#1565c0; border-bottom: 2px solid #2196F3; padding-bottom: 5px;">🏗️ Configuration de votre Espace</h3>
+
+<div class="form-group">
+<label for="descFichier">1️⃣ Description de votre PDF / Vidéo (Max 60 lettres) :</label>
+<input type="text" id="descFichier" maxlength="60" placeholder="Ex: Pack de 5 Ebooks pour apprendre le business...">
+</div>
+
+<div class="form-group">
+<label for="numDepot">2️⃣ Numéro destiné à recevoir vos dépôts :</label>
+<input type="tel" id="numDepot" placeholder="Ex: 76XXXXXX">
+</div>
+
+<div class="form-group">
+<label for="prixEspace">3️⃣ Prix de vente de votre fichier (Fr CFA) :</label>
+<input type="number" id="prixEspace" placeholder="Ex: 500">
+</div>
+
+<div class="form-group">
+<label for="fileInput">4️⃣ Importer votre fichier PDF ou votre Vidéo (Max 10 Mo) :</label>
+<input type="file" id="fileInput" accept="application/pdf, video/*" style="border: none; padding: 5px 0;">
+</div>
+
+<button onclick="validerConfigurationEspace()" style="background:#1565c0; color:white; font-weight: bold; font-size: 18px; margin-top: 10px;">🚀 Valider et publier mon espace</button>
 </div>
 
 <button onclick="retourAuCatalogue()" style="background:#666; color:white; margin-top:20px;">🏠 Retour au catalogue</button>
@@ -139,9 +160,9 @@ let timerStarted = false;
 let derniereVerification = "";
 let appareilID = obtenirAppareilID();
 
-// Données d'achat en cours
 let articleSelectionne = "";
 let montantSelectionne = 300;
+let expirationDateGlobale = null;
 
 function genererIdentifiantSecours() {
 return 'dev-' + Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
@@ -168,7 +189,6 @@ btn.onclick = () => selectionnerAchat(`Location Espace ${formattedNum}`, 1000);
 spacesContainer.appendChild(btn);
 }
 
-// Navigation entre les écrans
 function connexion(){
 const phone = document.getElementById("loginPhone").value.trim();
 if(!phone || phone.length < 8){ alert("Numéro invalide ❌"); return; }
@@ -213,9 +233,7 @@ document.getElementById("topcode").style.display="none";
 document.getElementById("timer").style.display="none";
 document.getElementById("code").value="";
 document.getElementById("uploadZone").style.display = "none";
-
-const oldBtn = document.querySelector(".downloadBtn");
-if(oldBtn){ oldBtn.remove(); }
+document.getElementById("formationAccessZone").style.display = "none";
 
 clearInterval(checkInterval);
 clearInterval(countdown);
@@ -251,6 +269,8 @@ if(new Date(p.expires_at) > new Date()){
 document.getElementById("topcode").style.display="block";
 document.getElementById("topcode").innerHTML = "🔑 Code actif : " + p.code;
 document.getElementById("code").value = p.code;
+expirationDateGlobale = p.expires_at;
+document.getElementById("formationAccessZone").style.display = "block";
 if(!timerStarted){ startTimer(p.expires_at); timerStarted = true; }
 }
 } else {
@@ -284,6 +304,7 @@ headers:{ apikey:SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, "Content
 body:JSON.stringify({
 phone:phone,
 status:"en attente",
+amount: montantSelectionne, 
 created_at: new Date().toISOString()
 })
 });
@@ -309,6 +330,7 @@ const p = data[data.length - 1];
 if(p.expires_at && new Date(p.expires_at) < new Date()){
 document.getElementById("topcode").style.display="none";
 document.getElementById("code").value="";
+document.getElementById("formationAccessZone").style.display = "none";
 return;
 }
 
@@ -326,6 +348,8 @@ document.getElementById("topcode").innerHTML = (p.expires_at ? "🔑 Code actif 
 document.getElementById("code").value = p.code;
 
 if(p.expires_at) {
+expirationDateGlobale = p.expires_at;
+document.getElementById("formationAccessZone").style.display = "block";
 if(!timerStarted){ startTimer(p.expires_at); timerStarted = true; }
 } else {
 document.getElementById("uploadZone").style.display = "block";
@@ -368,72 +392,82 @@ document.getElementById("topcode").style.display="block";
 document.getElementById("topcode").innerHTML = p.expires_at ? "🔑 Code actif : " + p.code : "🔒 Code Permanent : " + p.code;
 
 if(p.expires_at) {
+expirationDateGlobale = p.expires_at;
+document.getElementById("formationAccessZone").style.display = "block";
 startTimer(p.expires_at);
-afficherBoutonTelechargement(p.expires_at);
 } else {
 document.getElementById("uploadZone").style.display = "block";
 }
 }
 
-function afficherBoutonTelechargement(expireDate) {
-const oldBtn = document.querySelector(".downloadBtn");
-if(oldBtn){ oldBtn.remove(); }
+// 👁️ FONCTION POUR VOIR LE PDF DIRECTEMENT
+function ouvrirPDF() {
+if(expirationDateGlobale && new Date(expirationDateGlobale) < new Date()){ alert("Code expiré ❌"); deconnexion(); return; }
+window.open("formation2026.pdf", "_blank");
+}
 
-const btn = document.createElement("button");
-btn.className = "downloadBtn";
-btn.innerText = "⬇ Télécharger la Formation";
-btn.style.position="fixed"; btn.style.bottom="20px"; btn.style.left="50%";
-btn.style.transform= "translateX(-50%)"; btn.style.padding="15px";
-btn.style.background="green"; btn.style.color="white"; btn.style.border="none";
-btn.style.borderRadius="10px"; btn.style.zIndex="9999";
-
-btn.onclick = ()=>{
-if(new Date(expireDate) < new Date()){ alert("Code expiré ❌"); btn.remove(); return; }
+// ⬇️ FONCTION POUR TÉLÉCHARGER LE PDF
+function telechargerPDF() {
+if(expirationDateGlobale && new Date(expirationDateGlobale) < new Date()){ alert("Code expiré ❌"); deconnexion(); return; }
 const a = document.createElement("a");
 a.href = "formation2026.pdf?nocache=" + Date.now();
 a.download = "formation2026.pdf";
 a.click();
-};
-document.body.appendChild(btn);
 }
 
-function importerFichier() {
+// 🚀 FONCTION DE VALIDATION FORMULAIRE LOCATAIRE (ESPACE DE VENTE)
+function validerConfigurationEspace() {
+const description = document.getElementById("descFichier").value.trim();
+const numero = document.getElementById("numDepot").value.trim();
+const prix = document.getElementById("prixEspace").value.trim();
 const fileInput = document.getElementById("fileInput");
-if (fileInput.files.length === 0) { alert("Sélectionnez d'abord un fichier ❌"); return; }
 
-const fichier = fileInput.files[0];
-const tailleMax = 5 * 1024 * 1024;
-
-if (fichier.size > tailleMax) {
-alert("Dépassement de limite ! Le fichier doit être inférieur à 5 Mo. ❌");
+if (!description || !numero || !prix || fileInput.files.length === 0) {
+alert("Veuillez remplir tous les 4 cadres obligatoires ! ❌");
 return;
 }
 
-alert(`Succès ! Votre fichier "${fichier.name}" (Taille: ${(fichier.size/1024/1024).toFixed(2)} Mo) est prêt pour l'intégration.`);
+if (description.length > 60) {
+alert("La description ne doit pas dépasser 60 lettres ! ❌");
+return;
 }
 
+const fichier = fileInput.files[0];
+const tailleMax = 10 * 1024 * 1024; // 10 Mo actualisés
+
+if (fichier.size > tailleMax) {
+alert("Dépassement de limite ! Le fichier ou la vidéo doit être inférieur à 10 Mo. ❌");
+return;
+}
+
+// Succès de la configuration locale
+alert(`Félicitations 🎉 !\n\nVotre espace est configuré :\nDescription : ${description}\nPrix : ${prix} Fr CFA\nDestinataire : ${numero}\nFichier prêt : ${fichier.name} (${(fichier.size/1024/1024).toFixed(2)} Mo)`);
+}
+
+// ⏳ COMPTE A REBOURS EN HEURES ET MINUTES UNIQUEMENT (SANS SECONDES)
 function startTimer(expireDate){
 clearInterval(countdown);
 const exp = new Date(expireDate);
 document.getElementById("timer").style.display="block";
 
-countdown = setInterval(()=>{
+const updateTimerText = () => {
 const diff = exp - new Date();
 if(diff <= 0){
 document.getElementById("timer").innerHTML = "❌ Code expiré";
 document.getElementById("topcode").style.display="none";
 document.getElementById("code").value="";
-const oldBtn = document.querySelector(".downloadBtn");
-if(oldBtn){ oldBtn.remove(); }
+document.getElementById("formationAccessZone").style.display = "none";
 timerStarted = false;
 clearInterval(countdown);
 return;
 }
 const h = Math.floor(diff/3600000);
 const m = Math.floor((diff%3600000)/60000);
-const s = Math.floor((diff%60000)/1000);
-document.getElementById("timer").innerHTML = "⏳ Expire dans " + h + "h " + m + "m " + s + "s";
-},1000);
+document.getElementById("timer").innerHTML = "⏳ Expire dans " + h + "h " + m + "m";
+};
+
+updateTimerText();
+countdown = setInterval(updateTimerText, 60000); // Rafraîchissement toutes les minutes
 }
 </script>
 </body>

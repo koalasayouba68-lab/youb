@@ -245,7 +245,7 @@ updateBody.expires_at = expires.toISOString();
 }
 } else {
 // Sécurité : si problème de lecture, on applique la règle des 2h par défaut
-const expires = new Date(Date.now() + 2*60*60*1000); 
+const expires = new Date(Date.now() + 72*60*60*1000); 
 updateBody.expires_at = expires.toISOString();
 }
 

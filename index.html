@@ -1,45 +1,374 @@
-import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="manifest.json">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; background: #f0f2f5; color: #1c1e21; }
+        
+        #header { position: fixed; top: 0; width: 100%; height: 56px; background: #fff; border-bottom: 1px solid #ddd; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; z-index: 500; box-sizing: border-box; }
+        .logo-app { font-weight: bold; font-size: 20px; color: #2E7D32; }
+        .profil-zone { display: flex; align-items: center; cursor: pointer; }
+        .profil-rond { width: 36px; height: 36px; border-radius: 50%; background: #e4e6eb; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 2px solid #2E7D32; font-size: 16px; }
+        .profil-rond img { width: 100%; height: 100%; object-fit: cover; }
+        
+        #menuProfil { display: none; position: fixed; top: 60px; right: 10px; background: white; border: 1px solid #ccd0d5; padding: 15px; border-radius: 8px; width: 250px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 600; }
+        
+        .container { max-width: 500px; margin: 70px auto 20px auto; padding: 10px; box-sizing: border-box; }
+        
+        input, textarea { width: 100%; padding: 10px; margin: 8px 0; box-sizing: border-box; border: 1px solid #ccd0d5; border-radius: 6px; font-size: 14px; }
+        button { width: 100%; padding: 10px; margin-top: 8px; cursor: pointer; border: none; border-radius: 6px; font-weight: bold; font-size: 14px; }
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Supabase.initialize(
-    url: 'https://gkqlmpkmzfvurkzgrjlm.supabase.co',
-    anonKey: 'sb_publishable_TpKfbr8y19-DzT9dQvlr5Q_2MR-ciXr',
-  );
-  runApp(const MyApp());
-}
+        .creer-post-bar { background: white; padding: 12px 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ccd0d5; display: flex; align-items: center; gap: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); cursor: pointer; }
+        .creer-post-bar input { background: #f0f2f5; border: none; border-radius: 20px; padding: 10px 15px; cursor: pointer; margin: 0; color: #65676b; pointer-events: none; }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: StatutPage(),
-      debugShowCheckedModeBanner: false,
-    );
-  }
-}
+        .carte-statut { background: white; border: 1px solid #ccd0d5; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); overflow: hidden; }
+        .carte-header { padding: 12px 15px; display: flex; align-items: center; gap: 10px; }
+        .carte-avatar { width: 40px; height: 40px; border-radius: 50%; background: #e4e6eb; display: flex; align-items: center; justify-content: center; overflow: hidden; font-weight: bold; color: #2E7D32; }
+        .carte-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .carte-meta { font-size: 12px; color: #65676b; }
+        .carte-nom { font-weight: bold; font-size: 14px; color: #050505; }
+        
+        .carte-corps { padding: 15px; font-size: 15px; word-break: break-word; line-height: 1.5; }
+        .carte-corps-colore { padding: 40px 20px; text-align: center; font-size: 18px; font-weight: bold; display: flex; align-items: center; justify-content: center; min-height: 150px; box-sizing: border-box; word-break: break-word; border-radius: 6px; margin: 10px; }
+    </style>
+</head>
+<body>
 
-class StatutPage extends StatefulWidget {
-  @override
-  State<StatutPage> createState() => _StatutPageState();
-}
+<div id="header">
+    <div class="logo-app">FasoApp</div>
+    <div class="profil-zone" onclick="toggleMenu()">
+        <div class="profil-rond" id="headerAvatar">📷</div>
+        <span style="margin-left: 8px; font-weight: bold; font-size: 14px;">Profil</span>
+        <span style="margin-left: 4px; font-size: 12px;">▼</span>
+    </div>
+</div>
 
-class _StatutPageState extends State<StatutPage> {
-  late final WebViewController controller;
+<div id="menuProfil">
+    <h3 style="margin-top:0; font-size:16px; color:#2E7D32;">Paramètres du compte</h3>
+    <input type="text" id="nomInput" placeholder="Nom">
+    <input type="text" id="prenomInput" placeholder="Prénom">
+    <input type="tel" id="telInput" placeholder="Numéro de téléphone">
+    
+    <label style="font-size:12px; color:#65676b; display:block; margin-top:8px;">Photo de profil :</label>
+    <input type="file" id="inputPhotoProfil" accept="image/*" style="font-size:12px; padding:4px;">
+    
+    <button onclick="enregistrerProfil()" style="background:#2E7D32; color:white;">Enregistrer</button>
+</div>
 
-  @override
-  void initState() {
-    super.initState();
-    controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..loadFlutterAsset('assets/index.html');
-  }
+<div class="container">
+    <!-- Écran Principal (Fil d'actualité direct) -->
+    <div id="mainInterface">
+        <div class="creer-post-bar" onclick="ouvrirPopup()">
+            <div class="profil-rond" id="feedAvatar" style="width:32px; height:32px; font-size:12px;">📷</div>
+            <input type="text" placeholder="Exprimez-vous..." readonly>
+        </div>
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(body: WebViewWidget(controller: controller));
-  }
-}
+        <div class="fil-actualite"></div>
+    </div>
+</div>
+
+<div id="popupPublier" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; padding:15px; box-sizing:border-box; overflow-y:auto;">
+    <div style="background:white; padding:20px; border-radius:12px; max-width:400px; margin:40px auto; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+        <h2 style="text-align:center; color:#2E7D32; margin-top:0;">Créer un Statut</h2>
+        
+        <textarea id="texteStatut" style="width:100%; height:120px; padding:12px; border:1px solid #ccd0d5; border-radius:8px; box-sizing:border-box; font-size:16px;" placeholder="Que voulez-vous dire ?"></textarea>
+        
+        <div style="margin: 12px 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;">
+            <button onclick="changerCouleur('transparent', 'black')" style="height: 35px; background: white; border: 1px solid #ccc; border-radius: 50%;" title="Aucune"></button>
+            <button onclick="changerCouleur('#009E60', 'white')" style="height: 35px; background: #009E60; border: none; border-radius: 50%;" title="Vert Faso"></button>
+            <button onclick="changerCouleur('#EF2B2D', 'white')" style="height: 35px; background: #EF2B2D; border: none; border-radius: 50%;" title="Rouge Faso"></button>
+            <button onclick="changerCouleur('#FF8C00', 'white')" style="height: 35px; background: #FF8C00; border: none; border-radius: 50%;" title="Orange Soleil"></button>
+            <button onclick="changerCouleur('#002366', 'white')" style="height: 35px; background: #002366; border: none; border-radius: 50%;" title="Bleu Royal"></button>
+            <button onclick="changerCouleur('#8A2BE2', 'white')" style="height: 35px; background: #8A2BE2; border: none; border-radius: 50%;" title="Violet Luxe"></button>
+            <button onclick="changerCouleur('#FFC0CB', 'black')" style="height: 35px; background: #FFC0CB; border: none; border-radius: 50%;" title="Rose Bonbon"></button>
+            <button onclick="changerCouleur('#FFD700', 'black')" style="height: 35px; background: #FFD700; border: none; border-radius: 50%;" title="Jaune Or"></button>
+            <button onclick="changerCouleur('#1A1A1A', 'white')" style="height: 35px; background: #1A1A1A; border: none; border-radius: 50%;" title="Noir Élégant"></button>
+            <button onclick="changerCouleur('linear-gradient(135deg, #009E60, #EF2B2D)', 'white')" style="height: 35px; background: linear-gradient(135deg, #009E60, #EF2B2D); border: none; border-radius: 50%;" title="Dégradé"></button>
+        </div>
+
+        <input type="file" id="filePicker" accept="image/*,video/*" style="display:none;">
+        
+        <button onclick="document.getElementById('filePicker').click()" style="background:#e4e6eb; color:#050505; width:100%; padding:10px; border-radius:6px; border:none; margin-top:8px; font-weight:bold;">
+            📁 Ajouter Photo ou Vidéo
+        </button>
+
+        <!-- Zone pour afficher l'aperçu de la vidéo sélectionnée -->
+        <div id="apercuMediaContainer" style="margin-top: 10px; display: none; text-align: center;">
+            <video id="apercuVideo" controls style="width: 100%; max-height: 200px; border-radius: 8px; background: black;"></video>
+        </div>
+        
+        <button id="btnPublier" style="background:#2E7D32; color:white; width:100%; padding:12px; border-radius:6px; border:none; font-weight:bold; font-size:16px; margin-top:12px;">PUBLIER</button>
+        <button onclick="fermerPopup()" style="background:#e4e6eb; color:#050505; width:100%; padding:10px; border-radius:6px; border:none; margin-top:8px;">Annuler</button>
+    </div>
+</div>
+
+<script>
+    const SUPABASE_URL = 'https://gkqlmpkmzfvurkzgrjlm.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_TpKfbr8y19-DzT9dQvlr5Q_2MR-ciXr';
+    
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let couleurActuelle = 'transparent';
+    let couleurTexteActuelle = 'black';
+    let avatarUrlGlobal = localStorage.getItem('faso_avatar') || '';
+
+    window.addEventListener('DOMContentLoaded', () => {
+        mettreAJourAvatarVisuel(avatarUrlGlobal);
+        const savedNom = localStorage.getItem('faso_nom');
+        const savedPrenom = localStorage.getItem('faso_prenom');
+        const savedTel = localStorage.getItem('faso_tel');
+        if(savedNom) document.getElementById('nomInput').value = savedNom;
+        if(savedPrenom) document.getElementById('prenomInput').value = savedPrenom;
+        if(savedTel) document.getElementById('telInput').value = savedTel;
+
+        // Charger directement les statuts à l'ouverture de la page
+        chargerStatuts();
+    });
+
+    function mettreAJourAvatarVisuel(url) {
+        const headerAvatar = document.getElementById('headerAvatar');
+        const feedAvatar = document.getElementById('feedAvatar');
+        if (url) {
+            headerAvatar.innerHTML = `<img src="${url}" alt="Profil">`;
+            feedAvatar.innerHTML = `<img src="${url}" alt="Profil">`;
+        } else {
+            headerAvatar.innerHTML = `📷`;
+            feedAvatar.innerHTML = `📷`;
+        }
+    }
+
+    function toggleMenu() {
+        const menu = document.getElementById('menuProfil');
+        menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+    }
+
+    async function enregistrerProfil() {
+        const nom = document.getElementById('nomInput').value;
+        const prenom = document.getElementById('prenomInput').value;
+        const tel = document.getElementById('telInput').value;
+        const fichierPhoto = document.getElementById('inputPhotoProfil').files[0];
+
+        let nouvelAvatar = avatarUrlGlobal;
+
+        try {
+            if (fichierPhoto) {
+                const fileName = 'profil_' + Date.now() + '_' + fichierPhoto.name;
+                const { error: uploadError } = await _supabase.storage
+                    .from('medias')
+                    .upload(fileName, fichierPhoto);
+
+                if (uploadError) throw uploadError;
+
+                const { data: publicURLData } = _supabase.storage
+                    .from('medias')
+                    .getPublicUrl(fileName);
+                
+                nouvelAvatar = publicURLData.publicUrl;
+            }
+
+            localStorage.setItem('faso_nom', nom);
+            localStorage.setItem('faso_prenom', prenom);
+            localStorage.setItem('faso_tel', tel);
+            localStorage.setItem('faso_avatar', nouvelAvatar);
+            avatarUrlGlobal = nouvelAvatar;
+
+            mettreAJourAvatarVisuel(avatarUrlGlobal);
+            alert("Profil enregistré avec succès !");
+            toggleMenu();
+            chargerStatuts(); // Recharge pour actualiser le nom/avatar sur les posts
+        } catch (error) {
+            alert("Erreur lors de l'enregistrement du profil : " + error.message);
+        }
+    }
+
+    async function chargerStatuts() {
+        try {
+            // 1. Calculer la limite de 72 heures
+            const limiteDate = new Date(Date.now() - (72 * 60 * 60 * 1000)).toISOString();
+
+            // 2. Charger uniquement les statuts récents (moins de 72h)
+            const { data: statuts, error } = await _supabase
+                .from('statuts')
+                .select('*')
+                .gte('created_at', limiteDate)
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+
+            // 3. Supprimer définitivement du serveur les posts qui dépassent 72 heures
+            await _supabase
+                .from('statuts')
+                .delete()
+                .lt('created_at', limiteDate);
+
+            const filContainer = document.querySelector('.fil-actualite'); 
+            if (!filContainer) return;
+
+            filContainer.innerHTML = "";
+
+            const nomUtilisateur = localStorage.getItem('faso_nom') || 'Utilisateur';
+            const prenomUtilisateur = localStorage.getItem('faso_prenom') || 'Faso';
+            const nomComplet = `${prenomUtilisateur} ${nomUtilisateur}`;
+
+            statuts.forEach(statut => {
+                const carte = document.createElement('div');
+                carte.className = "carte-statut";
+
+                let contenuCorps = "";
+                const bgStyle = statut.bg_color && statut.bg_color !== 'transparent' ? `background: ${statut.bg_color}; color: ${statut.text_color || 'black'};` : '';
+                
+                if (bgStyle) {
+                    contenuCorps += `<div class="carte-corps-colore" style="${bgStyle}">${statut.texte || ""}</div>`;
+                } else if (statut.texte) {
+                    contenuCorps += `<div class="carte-corps">${statut.texte}</div>`;
+                }
+
+                if (statut.media_url) {
+                    if (statut.media_url.match(/\.(mp4|webm|ogg)$/i)) {
+                        contenuCorps += `<video src="${statut.media_url}" controls style="width: 100%; display: block; max-height: 400px; object-fit: contain; background: black;"></video>`;
+                    } else {
+                        contenuCorps += `<img src="${statut.media_url}" alt="Média" style="width: 100%; display: block; max-height: 400px; object-fit: cover;">`;
+                    }
+                }
+
+                const avatarHtml = avatarUrlGlobal ? `<img src="${avatarUrlGlobal}" alt="Avatar">` : `👤`;
+                const dateFormatee = new Date(statut.created_at).toLocaleString();
+
+                carte.innerHTML = `
+                    <div class="carte-header">
+                        <div class="carte-avatar">${avatarHtml}</div>
+                        <div>
+                            <div class="carte-nom">${nomComplet}</div>
+                            <div class="carte-meta">${dateFormatee}</div>
+                        </div>
+                    </div>
+                    ${contenuCorps}
+                `;
+
+                filContainer.appendChild(carte);
+            });
+
+        } catch (error) {
+            console.error("Erreur chargement :", error.message);
+        }
+    }
+
+    function ouvrirPopup() {
+        document.getElementById('popupPublier').style.display = 'block';
+    }
+
+    function fermerPopup() {
+        document.getElementById('popupPublier').style.display = 'none';
+        resetPopupForm();
+    }
+
+    function changerCouleur(couleurFond, couleurTexte) {
+        couleurActuelle = couleurFond;
+        couleurTexteActuelle = couleurTexte;
+        const texteBox = document.getElementById('texteStatut');
+        texteBox.style.background = couleurFond;
+        texteBox.style.color = couleurTexte;
+        texteBox.style.backgroundImage = "none";
+    }
+
+    function resetPopupForm() {
+        const texteStatut = document.getElementById('texteStatut');
+        texteStatut.value = "";
+        texteStatut.style.background = "white";
+        texteStatut.style.color = "black";
+        texteStatut.style.backgroundImage = "none";
+        couleurActuelle = 'transparent';
+        couleurTexteActuelle = 'black';
+        document.getElementById('filePicker').value = "";
+        document.getElementById('apercuMediaContainer').style.display = 'none';
+        document.getElementById('apercuVideo').src = "";
+    }
+
+    const filePicker = document.getElementById('filePicker');
+    const btnPublier = document.getElementById('btnPublier');
+    const texteStatut = document.getElementById('texteStatut');
+    const apercuContainer = document.getElementById('apercuMediaContainer');
+    const apercuVideo = document.getElementById('apercuVideo');
+
+    filePicker.addEventListener('change', function(event) {
+        const fichier = event.target.files[0];
+        if (!fichier) return;
+
+        if (fichier.type.startsWith('image/')) {
+            const lecteur = new FileReader();
+            lecteur.onload = function(e) {
+                texteStatut.style.backgroundImage = `url(${e.target.result})`;
+                texteStatut.style.backgroundSize = 'cover';
+                texteStatut.style.backgroundPosition = 'center';
+            }
+            lecteur.readAsDataURL(fichier);
+            apercuContainer.style.display = 'none';
+            apercuVideo.src = "";
+        } else if (fichier.type.startsWith('video/')) {
+            const videoUrl = URL.createObjectURL(fichier);
+            apercuVideo.src = videoUrl;
+            apercuContainer.style.display = 'block';
+            texteStatut.style.backgroundImage = 'none';
+        }
+    });
+
+    btnPublier.addEventListener('click', async function() {
+        const texte = texteStatut.value.trim();
+        const fichier = filePicker.files[0];
+        
+        if (texte === "" && !fichier) {
+            alert("Écris un message ou ajoute un fichier avant de publier ! ❌");
+            return;
+        }
+
+        btnPublier.innerText = "Publication en cours...";
+        btnPublier.disabled = true;
+
+        try {
+            let mediaUrl = null;
+
+            if (fichier) {
+                const fileName = Date.now() + '_' + fichier.name;
+                const { error: uploadError } = await _supabase.storage
+                    .from('medias')
+                    .upload(fileName, fichier);
+
+                if (uploadError) throw uploadError;
+
+                const { data: publicURLData } = _supabase.storage
+                    .from('medias')
+                    .getPublicUrl(fileName);
+                    
+                mediaUrl = publicURLData.publicUrl;
+            }
+
+            const { error: insertError } = await _supabase
+                .from('statuts')
+                .insert([
+                    { 
+                        texte: texte,
+                        media_url: mediaUrl,
+                        bg_color: couleurActuelle,
+                        text_color: couleurTexteActuelle
+                    }
+                ]);
+
+            if (insertError) throw insertError;
+
+            fermerPopup();
+            await chargerStatuts();
+
+        } catch (error) {
+            alert("Erreur : " + error.message);
+        } finally {
+            btnPublier.innerText = "PUBLIER";
+            btnPublier.disabled = false;
+        }
+    });
+</script>
+
+</body>
+</html>
